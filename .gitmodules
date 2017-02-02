@@ -69,10 +69,13 @@
 [submodule "libzmq"]
 	path = libzmq
 	url = https://github.com/zeromq/libzmq
+#[submodule "czmq"]
+#	path = czmq
+#	url = https://github.com/42ity/czmq
+#	branch = v3.0.2
 [submodule "czmq"]
 	path = czmq
-	url = https://github.com/42ity/czmq
-#	branch = v3.0.2
+	url = https://github.com/zeromq/czmq
 [submodule "fty-kpi-power-uptime"]
 	path = fty-kpi-power-uptime
 	url = https://github.com/42ity/fty-kpi-power-uptime
