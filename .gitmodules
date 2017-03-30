@@ -49,9 +49,11 @@
 [submodule "fty-core"]
 	path = fty-core
 	url = https://github.com/42ity/fty-core
+	branch = czmq4
 [submodule "fty-asset"]
 	path = fty-asset
 	url = https://github.com/42ity/fty-asset
+	branch = czmq4
 [submodule "fty-alert-list"]
 	path = fty-alert-list
 	url = https://github.com/42ity/fty-alert-list
@@ -59,6 +61,7 @@
 [submodule "fty-metric-compute"]
 	path = fty-metric-compute
 	url = https://github.com/42ity/fty-metric-compute
+	branch = czmq4
 [submodule "fty-nut"]
 	path = fty-nut
 	url = https://github.com/42ity/fty-nut
@@ -66,9 +69,11 @@
 [submodule "malamute"]
 	path = malamute
 	url = https://github.com/zeromq/malamute
+	branch = czmq4
 [submodule "fty-alert-engine"]
 	path = fty-alert-engine
 	url = https://github.com/42ity/fty-alert-engine
+	branch = czmq4
 [submodule "fty-metric-composite"]
 	path = fty-metric-composite
 	url = https://github.com/42ity/fty-metric-composite
@@ -76,9 +81,11 @@
 [submodule "fty-rest"]
 	path = fty-rest
 	url = https://github.com/42ity/fty-rest
+	branch = czmq4
 [submodule "libzmq"]
 	path = libzmq
 	url = https://github.com/zeromq/libzmq
+	branch = czmq4
 [submodule "czmq"]
 	path = czmq
 	url = https://github.com/zeromq/czmq
@@ -100,6 +107,7 @@
 [submodule "fty-example"]
 	path = fty-example
 	url = https://github.com/42ity/fty-example
+	branch = czmq4
 [submodule "libsodium"]
 	path = libsodium
 	url = https://github.com/jedisct1/libsodium.git
@@ -107,12 +115,16 @@
 [submodule "fty-metric-snmp"]
 	path = fty-metric-snmp
 	url = https://github.com/42ity/fty-metric-snmp
+	branch = czmq4
 [submodule "fty-alert-flexible"]
 	path = fty-alert-flexible
 	url = https://github.com/42ity/fty-alert-flexible
+	branch = czmq4
 [submodule "fty-info"]
 	path = fty-info
 	url = https://github.com/42ity/fty-info
+	branch = czmq4
 [submodule "fty-mdns-sd"]
 	path = fty-mdns-sd
 	url = https://github.com/42ity/fty-mdns-sd
+	branch = czmq4
