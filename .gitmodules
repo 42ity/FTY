@@ -5,6 +5,7 @@
 [submodule "fty-proto"]
 	path = fty-proto
 	url = https://github.com/42ity/fty-proto
+	branch = czmq4
 [submodule "zproject"]
 	path = zproject
 	url = https://github.com/zeromq/zproject
@@ -24,21 +25,27 @@
 [submodule "fty-outage"]
 	path = fty-outage
 	url = https://github.com/42ity/fty-outage
+	branch = czmq4
 [submodule "fty-email"]
 	path = fty-email
 	url = https://github.com/42ity/fty-email
+	branch = czmq4
 [submodule "fty-metric-cache"]
 	path = fty-metric-cache
 	url = https://github.com/42ity/fty-metric-cache
+	branch = czmq4
 [submodule "fty-sensor-env"]
 	path = fty-sensor-env
 	url = https://github.com/42ity/fty-sensor-env
+	branch = czmq4
 [submodule "fty-metric-store"]
 	path = fty-metric-store
 	url = https://github.com/42ity/fty-metric-store
+	branch = czmq4
 [submodule "fty-metric-tpower"]
 	path = fty-metric-tpower
 	url = https://github.com/42ity/fty-metric-tpower
+	branch = czmq4
 [submodule "fty-core"]
 	path = fty-core
 	url = https://github.com/42ity/fty-core
@@ -48,12 +55,14 @@
 [submodule "fty-alert-list"]
 	path = fty-alert-list
 	url = https://github.com/42ity/fty-alert-list
+	branch = czmq4
 [submodule "fty-metric-compute"]
 	path = fty-metric-compute
 	url = https://github.com/42ity/fty-metric-compute
 [submodule "fty-nut"]
 	path = fty-nut
 	url = https://github.com/42ity/fty-nut
+	branch = czmq4
 [submodule "malamute"]
 	path = malamute
 	url = https://github.com/zeromq/malamute
@@ -63,22 +72,23 @@
 [submodule "fty-metric-composite"]
 	path = fty-metric-composite
 	url = https://github.com/42ity/fty-metric-composite
+	branch = czmq4
 [submodule "fty-rest"]
 	path = fty-rest
 	url = https://github.com/42ity/fty-rest
 [submodule "libzmq"]
 	path = libzmq
 	url = https://github.com/zeromq/libzmq
-#[submodule "czmq"]
-#	path = czmq
-#	url = https://github.com/42ity/czmq
-#	branch = v3.0.2
 [submodule "czmq"]
 	path = czmq
 	url = https://github.com/zeromq/czmq
+### In this branch, we try to use upstream instead
+#	url = https://github.com/42ity/czmq
+#	branch = v3.0.2
 [submodule "fty-kpi-power-uptime"]
 	path = fty-kpi-power-uptime
 	url = https://github.com/42ity/fty-kpi-power-uptime
+	branch = czmq4
 [submodule "tntnet"]
 	path = tntnet
 	url = https://github.com/42ity/tntnet
