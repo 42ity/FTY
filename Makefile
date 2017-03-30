@@ -476,7 +476,7 @@ CONFIG_OPTS_czmq += CPPFLAGS="$(CPPFLAGS) -Wno-deprecated-declarations"
 # That version of czmq autogen.sh requires a "libtool" while debian has
 # only "libtoolize", so fall back if needed.
 $(BUILD_OBJ_DIR)/czmq/.autogened: $(BUILD_OBJ_DIR)/czmq/.prepped
-	$(call autogen_sub,$(notdir $(@D))) || \
+	+$(call autogen_sub,$(notdir $(@D))) || \
 	 ( cd "$(BUILD_SRC_DIR)/$(notdir $(@D))/$(BUILD_SUB_DIR_$(notdir $(@D)))" \
 	   && autoreconf -fiv )
 	$(TOUCH) $@
@@ -661,30 +661,30 @@ $(BUILD_OBJ_DIR)/%/.prepped: $(BUILD_OBJ_DIR)/%/.prep-newestcommit
 	@cat "$<" > "$@"
 
 $(BUILD_OBJ_DIR)/%/.autogened: $(BUILD_OBJ_DIR)/%/.prepped
-	$(call autogen_sub,$(notdir $(@D)))
+	+$(call autogen_sub,$(notdir $(@D)))
 
 $(BUILD_OBJ_DIR)/%/.configured: $(BUILD_OBJ_DIR)/%/.autogened
-	$(call configure_sub,$(notdir $(@D)))
+	+$(call configure_sub,$(notdir $(@D)))
 
 $(BUILD_OBJ_DIR)/%/.built: $(BUILD_OBJ_DIR)/%/.configured
-	$(call build_sub,$(notdir $(@D)))
+	+$(call build_sub,$(notdir $(@D)))
 
 $(BUILD_OBJ_DIR)/%/.disted: $(BUILD_OBJ_DIR)/%/.configured
-	$(call dist_sub,$(notdir $(@D)))
+	+$(call dist_sub,$(notdir $(@D)))
 
 # Technically, build and install may pursue different targets
 # so maybe this should depend on just .configured
 $(BUILD_OBJ_DIR)/%/.installed: $(BUILD_OBJ_DIR)/%/.built
-	$(call install_sub,$(notdir $(@D)))
+	+$(call install_sub,$(notdir $(@D)))
 
 $(BUILD_OBJ_DIR)/%/.checked: $(BUILD_OBJ_DIR)/%/.built
-	$(call check_sub,$(notdir $(@D)))
+	+$(call check_sub,$(notdir $(@D)))
 
 $(BUILD_OBJ_DIR)/%/.distchecked: $(BUILD_OBJ_DIR)/%/.built
-	$(call distcheck_sub,$(notdir $(@D)))
+	+$(call distcheck_sub,$(notdir $(@D)))
 
 $(BUILD_OBJ_DIR)/%/.memchecked: $(BUILD_OBJ_DIR)/%/.built
-	$(call memcheck_sub,$(notdir $(@D)))
+	+$(call memcheck_sub,$(notdir $(@D)))
 
 # Phony targets to make or clean up a build of components
 # Also note rules must be not empty to actually run something
