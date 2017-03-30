@@ -41,22 +41,71 @@ default|"default-tgt:"*)
             BUILD_TGT="`echo "$BUILD_TYPE" | sed 's,^default-tgt:,,'`" ;;
     esac
 
-    echo "`date`: Starting the sequential build attempt for singular target $BUILD_TGT..."
+    if [ x"$CI_WIPE_FIRST" = xyes ]; then
+        echo "`date`: First wiping stashed workspace directories..."
+        $CI_TIME make wipe
+    fi
 
-    ( echo "`date`: Starting the parallel build attempt..."; \
-      $CI_TIME make VERBOSE=1 -k -j8 "$BUILD_TGT"; ) || \
-    ( echo "==================== PARALLEL ATTEMPT FAILED ($?) =========="; \
-      echo "`date`: Starting the sequential build attempt..."; \
-      $CI_TIME make VERBOSE=1 "$BUILD_TGT" )
+    ( echo "`date`: Starting the quiet parallel build attempt..."
+#      case "$BUILD_TYPE" in
+#        default-tgt:*check*)
+#            echo "`date`: First fully build and install some components that are picky to sub-make during checks..."
+#            $CI_TIME make VERBOSE=0 V=0 -j1 install/libcidr install/libzmq install/czmq install/tntdb || exit
+#            echo "`date`: Proceed with general build..."
+#            ;;
+#      esac
+      $CI_TIME make VERBOSE=0 V=0 -k -j4 "$BUILD_TGT" &
+      PID_MAKE=$!
+      ( minutes=0
+        limit=29
+        while kill -0 ${PID_MAKE} >/dev/null 2>&1 ; do
+          printf ' \b' # Hidden print to keep the logs ticking
+          if [ "$minutes" -ge "$limit" ]; then
+            echo "`date`: Parallel build timed out over $limit minutes" >&2
+            kill -15 ${PID_MAKE}
+            sleep 5
+            exit 1
+          fi
+          minutes="$(expr $minutes + 1)"
+          sleep 60
+        done
+        echo "`date`: Parallel build attempt seems done" ) &
+      PID_SLEEPER=$!
+      wait ${PID_MAKE} ${PID_SLEEPER}
+    ) || \
+    ( echo "==================== PARALLEL ATTEMPT FAILED ($?) =========="
+      echo "`date`: Starting the sequential build attempt..."
+      # Avoiding travis_wait() and build timeouts during tests
+      # thanks to comments in Travis-CI issue #4190
+      $CI_TIME make VERBOSE=1 "$BUILD_TGT" &
+      PID_MAKE=$!
+      ( minutes=0
+        limit=29
+        while kill -0 ${PID_MAKE} >/dev/null 2>&1 ; do
+          printf ' \b' # Hidden print to keep the logs ticking
+          if [ "$minutes" -ge "$limit" ]; then
+            echo "`date`: Sequential build timed out over $limit minutes" >&2
+            kill -15 ${PID_MAKE}
+            sleep 5
+            exit 1
+          fi
+          minutes="$(expr $minutes + 1)"
+          sleep 60
+        done
+        echo "`date`: Sequential build attempt seems done" ) &
+      PID_SLEEPER=$!
+      wait ${PID_MAKE} ${PID_SLEEPER}
+    )
+    echo "=== `date`: BUILDS FINISHED ($?)"
 
-    echo "=== Are GitIgnores good after 'make $BUILD_TGT'? (should have no output below)"
-    git status -s || true
+    echo "=== `date`: Are GitIgnores good after 'make $BUILD_TGT'? (should have no output below)"
+    git status -s || git status || true
     echo "==="
     if [ "$HAVE_CCACHE" = yes ]; then
         echo "CCache stats after build:"
         ccache -s
     fi
-    echo "=== Exiting after the custom-build target 'make $BUILD_TGT' succeeded OK"
+    echo "=== `date`: Exiting after the custom-build target 'make $BUILD_TGT' succeeded OK"
     exit 0
     ;;
 bindings)

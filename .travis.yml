@@ -10,8 +10,17 @@ language:
 python:
 - '2.7'
 
+# Cache the previous build areas, to reuse them if respective components
+# (or their dependencies) did not change since last build. The Makefile
+# should detect if some git HEAD marker file became newer and would then
+# rebuild and reinstall the component (and those who depend on it).
 cache:
-- ccache
+  pip: true
+  ccache: true
+  directories:
+    - ${TRAVIS_BUILD_DIR}/.srcclone/
+    - ${TRAVIS_BUILD_DIR}/.build/
+    - ${TRAVIS_BUILD_DIR}/.install/
 
 os:
 - linux
@@ -87,16 +96,24 @@ env:
     - BUILD_TYPE=default-tgt:dist
     - BUILD_TYPE=default-tgt:distcheck
     - BUILD_TYPE=default-tgt:memcheck
+    - BUILD_TYPE=default-tgt:experimental
 
 before_install:
-- DO_BUMP=no ./sync.sh
+- date; echo Syncing Git repos...
+- DO_BUMP=no time ./sync.sh
 - if [ $TRAVIS_OS_NAME == "osx" ] ; then brew update; brew install binutils asciidoc docbook-xsl ; XML_CATALOG_FILES=/usr/local/etc/xml/catalog ; export XML_CATALOG_FILES ; fi
 
 install:
+- date; echo Installing pycparser...
 - pip install pycparser
 
 before_script:
+- date; echo Fixing up SASL...
 - ./.travis.fixsasl
 
 # Hand off to generated script for each BUILD_TYPE
+### Note there are many components to test, it takes time...
+### and some tests just sleep and resume slowly, so Travis gets worried.
+###script: travis_wait 120 ./ci_build.sh
+###script: echo "Current envvars:"; set ; ./ci_build.sh
 script: ./ci_build.sh

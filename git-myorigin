@@ -26,7 +26,7 @@ change_upstream() (
     cd "$DIR_NAME" || return
 
     echo "===== BEFORE: mis-named upstream posing as origin"
-    git remote -v | egrep -i '^origin.*github.com/(42ity|imatix|zeromq|maekitalo)/' && \
+    git remote -v | egrep -i '^origin.*github.com/(42ity|imatix|zeromq|maekitalo|jedisct1)/' && \
         { git remote rename origin upstream || git remote rm origin; }
 
     echo "===== BEFORE: presence of any origin"

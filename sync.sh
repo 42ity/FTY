@@ -36,24 +36,36 @@ $CI_TIME git pull --all
 # NOTE: sync is toxic to established workspaces, as it "resyncs the URL" and
 # so overwrites locally defined "origin" URL (e.g. pointing to a developers'
 # fork) back to the upstream project URL. For daily usage, "update" suffices.
+# The "init" is a no-op if things are already set up.
+# The next line causes submodules to track the branch they are set up to use
+# via .gitmodules file, or the "master" one. Note that each "submodule update"
+# checks out a specified SHA1 and stops tracking any specific branch.
 # git submodule init --recursive && \
 # git submodule sync --recursive && \
 $CI_TIME git submodule init && \
 $CI_TIME git submodule update --recursive --remote --merge && \
+$CI_TIME git submodule foreach -q --recursive 'git checkout $(git config -f $toplevel/.gitmodules submodule.$name.branch || echo master)' && \
 $CI_TIME git submodule foreach "git pull --all" && \
 $CI_TIME git status -s
 
-[ x"${DO_BUMP-}" = xno ] || \
-git status -s | while read STATUS OBJNAME ; do
+if [ x"${DO_BUMP-}" = xno ] ; then
+    git status -s
+    echo "Skip Adding changed objects to git commit (envvar DO_BUMP=no was pre-set)"
+else
     DO_BUMP=no
-    if [ -n "$OBJNAME" ]; then
-        case "$STATUS" in
-            M) DO_BUMP=yes ; break ;;
-        esac
-    fi
-done
+    # Let shell cut off indentations and other whitespace
+    git status -s | ( while read STATUS OBJNAME ; do
+        if [ -n "$OBJNAME" ]; then
+            case "$STATUS" in
+                M) exit 0 ;;
+            esac
+        fi
+      done
+      exit 1
+    ) && DO_BUMP=yes
+fi
 
 if [ x"${DO_BUMP-}" = xyes ]; then
-    echo "Adding changed objects to git commit..."
+    echo "Adding changed objects to git commit (pre-set envvar DO_BUMP=no to avoid this)..."
     $CI_TIME git commit -a -m 'Updated references to git submodule HEADs at '"`date -u`"
 fi

@@ -1,5 +1,7 @@
 = README for FTY
 
+== About the FTY repository
+
 FTY is a "dispatcher" repository which links (as "git submodules") to the
 repositories used to build the 42ITy(TM) project. This includes some third
 party projects (git HEADs), forks of third-party projects customized for
@@ -18,6 +20,8 @@ For a rebuild from scratch (to be automated) you'd need:
   each other as defined in their `profile.xml` manifests for `zproject`
 * `fty-core` and `fty-rest` possibly come last
 
+== Making the ecosystem
+
 The included `Makefile` automates building of project components, including
 the customized third-party projects, in the order of dependencies. It is
 ready for correct parallel compilation with GNU Make 3.81 or newer, and can
@@ -30,6 +34,8 @@ source code to build.
 This `Makefile` has been verified on Debian 8 (devel images for the project
 build farm); feel free to update the recipes if needed for other OSes and
 distros.
+
+== Fetching all current sources and updating the HEADs
 
 Note that when you initially check out a clone of this repository, you only
 get meta-data. To instantiate (or subsequently update) the actual source
@@ -44,6 +50,43 @@ TODO: Add a regular job, or one triggered by commits to project repos, to
 run such updates and push new references to common FTY dispatcher repo's
 `upstream/master`.
 
+== Adding a tracked repository
+
+As new agents and components and perhaps tweaked third-party projects are
+added into the mix, either in the common Git organization or in your own
+set of FTY repositories forks, you can add and check out new Git submodules
+like this:
+
+----
+:; git submodule add https://github.com/42ity/fty-new-agent
+----
+
+or (to specify a default non-`master` branch right away):
+
+----
+:; git submodule add -b 42ity https://github.com/42ity/third-party-fork
+----
+
+Note that after adding sources a submodule, you'd likely want to reference
+its place in the dependency chain for the `Makefile` of this FTY workspace
+as well.
+
+== Changing tracked repository data
+
+If the submodule configuration needs updates due to evolution over time or
+because of initial-setup errors, such as that a different remote repository
+or default branch must be tracked, you may want to edit the `.gitmodules`
+file directly to set the details you need. It may be required to `git deinit`
+an existing working copy of the submodule and check it out again, to use the
+new repository tracking metadata - so before such operations do not forget
+to commit your changes and push them out into the github fork. Alternately,
+local copies of repositories are just directories with special files - so
+you can just rename them to sit nearby, and as far as the Git software is
+concerned, by this action you've just nuked a checked out submodule and
+should simply re-init it again.
+
+== Developer "origin" forks vs. common "upstream" repos
+
 Also note that if you clone `FTY`, the checked-out repositories will likely
 initially refer to the component repository URLs as an `origin`, while they
 are rather `upstream` for our context (and a real `origin` would be your
@@ -56,6 +99,9 @@ case, change to the subdirectory of the component in question and run the
 :; ./git-myorigin */
 ----
 
+== More reading
+
 For some more inspiration on workflow with submodules, refer to e.g.:
 
 * https://brooklyn.apache.org/developers/code/git-more.html
+* http://stackoverflow.com/a/18799234/4715872
