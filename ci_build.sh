@@ -2,7 +2,7 @@
 
 ################################################################################
 # This file is based on a template used by zproject, but isn't auto-generated. #
-# Building of dependencies (our components and forks of third-party projects   #
+# Building of dependencies (our components and forks of third-party projects)  #
 # in correct order is buried into the Makefile.                                #
 ################################################################################
 
