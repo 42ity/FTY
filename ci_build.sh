@@ -102,7 +102,8 @@ default|"default-tgt:"*)
       wait ${PID_SLEEPER} || RES=$?
       exit $RES
     )
-    echo "=== `date`: BUILDS FINISHED ($?)"
+    BLDRES=$?
+    echo "=== `date`: BUILDS FINISHED ($BLDRES)"
 
     echo "=== `date`: Are GitIgnores good after 'make $BUILD_TGT'? (should have no output below)"
     git status -s || git status || true
@@ -111,8 +112,10 @@ default|"default-tgt:"*)
         echo "CCache stats after build:"
         ccache -s
     fi
-    echo "=== `date`: Exiting after the custom-build target 'make $BUILD_TGT' succeeded OK"
-    exit 0
+    [ "$BLDRES" = 0 ] && \
+    echo "=== `date`: Exiting after the custom-build target 'make $BUILD_TGT' succeeded OK" || \
+    echo "=== `date`: Exiting after the custom-build target 'make $BUILD_TGT' failed with code $BLDRES" >&2
+    exit $BLDRES
     ;;
 bindings)
     pushd "./bindings/${BINDING}" && ./ci_build.sh
