@@ -2,4 +2,5 @@
 .install/
 .srcclone/
 travis*.log
-
+czmq/
+czmq
