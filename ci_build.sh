@@ -54,7 +54,7 @@ default|"default-tgt:"*)
 #            echo "`date`: Proceed with general build..."
 #            ;;
 #      esac
-      BLDRES=$?
+      BLDRES=$?
       $CI_TIME make VERBOSE=0 V=0 -k -j4 "$BUILD_TGT" &
       PID_MAKE=$!
       ( minutes=0
