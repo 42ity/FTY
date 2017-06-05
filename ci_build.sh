@@ -54,6 +54,7 @@ default|"default-tgt:"*)
 #            echo "`date`: Proceed with general build..."
 #            ;;
 #      esac
+      BLDRES=$?
       $CI_TIME make VERBOSE=0 V=0 -k -j4 "$BUILD_TGT" &
       PID_MAKE=$!
       ( minutes=0
@@ -101,7 +102,7 @@ default|"default-tgt:"*)
       wait ${PID_MAKE} || RES=$?
       wait ${PID_SLEEPER} || RES=$?
       exit $RES
-    )
+    ) || \
     BLDRES=$?
     echo "=== `date`: BUILDS FINISHED ($BLDRES)"
 
@@ -114,7 +115,7 @@ default|"default-tgt:"*)
     fi
     [ "$BLDRES" = 0 ] && \
     echo "=== `date`: Exiting after the custom-build target 'make $BUILD_TGT' succeeded OK" || \
-    echo "=== `date`: Exiting after the custom-build target 'make $BUILD_TGT' failed with code $BLDRES" >&2
+    echo "=== `date`: Exiting after the custom-build target 'make $BUILD_TGT' FAILED with code $BLDRES" >&2
     exit $BLDRES
     ;;
 bindings)
