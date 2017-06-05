@@ -523,7 +523,8 @@ $(ORIGIN_SRC_DIR)/czmq: $(ORIGIN_SRC_DIR)/czmq-master
 
 endif
 
-$(BUILD_OBJ_DIR)/czmq/.prepped $(BUILD_OBJ_DIR)/czmq/.prep-newestcommit: $(ORIGIN_SRC_DIR)/czmq
+# TODO: Rework this multiversioning - would not be nice for parallel builds of different things in one workspace
+$(BUILD_OBJ_DIR)/czmq/.prepped $(BUILD_OBJ_DIR)/czmq/.prep-newestcommit $(ORIGIN_SRC_DIR)/czmq/.prep-newestcommit : $(ORIGIN_SRC_DIR)/czmq
 
 $(BUILD_OBJ_DIR)/czmq/.configured: $(BUILD_OBJ_DIR)/libzmq/.installed
 
