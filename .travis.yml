@@ -133,12 +133,6 @@ env:
     - CI_TIME=true
     - CI_TRACE=false
     - CI_QUIET=true
-  matrix:
-    - CI_CZMQ_VER=3 BUILD_TYPE=default-tgt:all
-    - CI_CZMQ_VER=3 BUILD_TYPE=default-tgt:install-all
-    - CI_CZMQ_VER=3 BUILD_TYPE=default-tgt:check
-    - CI_CZMQ_VER=3 BUILD_TYPE=default-tgt:dist
-    - CI_CZMQ_VER=3 BUILD_TYPE=default-tgt:distcheck
 
 # Note: this matrix currently assumes that "CI_CZMQ_VER=4" means builds
 # against upstream/master from github, and "CI_CZMQ_VER=3" means usage
@@ -146,8 +140,42 @@ env:
 # and "CI_CZMQ_VER=pkg" means usage of pre-packaged binaries from upstream.
 # In either of the source builds, the libsodium, libzmq and malamute are
 # from respective upstream/master's.
+# We group the most informative builds first so they complete (or fail) early.
 matrix:
   include:
+  - env: CI_CZMQ_VER=3 BUILD_TYPE=default-tgt:all
+    os: linux
+    services: docker
+    sudo: false
+    addons:
+      apt:
+        packages:
+        - *pkg_deps_common
+        - *pkg_deps_doctools
+
+  - env: CI_CZMQ_VER=4 BUILD_TYPE=default-tgt:all
+    os: linux
+    services: docker
+    sudo: false
+    addons:
+      apt:
+        packages:
+        - *pkg_deps_common
+        - *pkg_deps_doctools
+
+  - env: CI_CZMQ_VER=pkg BUILD_TYPE=default-tgt:all
+    os: linux
+    services: docker
+    sudo: false
+    addons:
+      apt:
+        sources: *pkg_src_zeromq_ubuntu12
+        packages:
+        - *pkg_deps_common
+        - *pkg_deps_doctools
+        - *pkg_deps_prereqs_zmq_master
+
+
   - env: CI_CZMQ_VER=3 BUILD_TYPE=default-tgt:memcheck
     os: linux
     services: docker
@@ -157,6 +185,64 @@ matrix:
         packages:
         - *pkg_deps_common
         - valgrind
+
+  - env: CI_CZMQ_VER=4 BUILD_TYPE=default-tgt:memcheck
+    os: linux
+    services: docker
+    sudo: false
+    addons:
+      apt:
+        packages:
+        - *pkg_deps_common
+        - valgrind
+
+  - env: CI_CZMQ_VER=pkg BUILD_TYPE=default-tgt:memcheck
+    os: linux
+    services: docker
+    sudo: false
+    addons:
+      apt:
+        sources: *pkg_src_zeromq_ubuntu12
+        packages:
+        - *pkg_deps_common
+        - valgrind
+        - *pkg_deps_prereqs_zmq_master
+
+
+  - env: CI_CZMQ_VER=3 BUILD_TYPE=default-tgt:install-all
+    os: linux
+    services: docker
+    sudo: false
+    addons:
+      apt:
+        packages:
+        - *pkg_deps_common
+        - *pkg_deps_doctools
+  - env: CI_CZMQ_VER=3 BUILD_TYPE=default-tgt:check
+    os: linux
+    services: docker
+    sudo: false
+    addons:
+      apt:
+        packages:
+        - *pkg_deps_common
+  - env: CI_CZMQ_VER=3 BUILD_TYPE=default-tgt:dist
+    os: linux
+    services: docker
+    sudo: false
+    addons:
+      apt:
+        packages:
+        - *pkg_deps_common
+  - env: CI_CZMQ_VER=3 BUILD_TYPE=default-tgt:distcheck
+    os: linux
+    services: docker
+    sudo: false
+    addons:
+      apt:
+        packages:
+        - *pkg_deps_common
+        - *pkg_deps_doctools
   - env: CI_CZMQ_VER=3 BUILD_TYPE=default-tgt:experimental
     os: linux
     services: docker
@@ -168,15 +254,6 @@ matrix:
         - *pkg_deps_doctools
         - valgrind
 
-  - env: CI_CZMQ_VER=4 BUILD_TYPE=default-tgt:all
-    os: linux
-    services: docker
-    sudo: false
-    addons:
-      apt:
-        packages:
-        - *pkg_deps_common
-        - *pkg_deps_doctools
   - env: CI_CZMQ_VER=4 BUILD_TYPE=default-tgt:install-all
     os: linux
     services: docker
@@ -211,15 +288,6 @@ matrix:
         packages:
         - *pkg_deps_common
         - *pkg_deps_doctools
-  - env: CI_CZMQ_VER=4 BUILD_TYPE=default-tgt:memcheck
-    os: linux
-    services: docker
-    sudo: false
-    addons:
-      apt:
-        packages:
-        - *pkg_deps_common
-        - valgrind
   - env: CI_CZMQ_VER=4 BUILD_TYPE=default-tgt:experimental
     os: linux
     services: docker
@@ -231,17 +299,6 @@ matrix:
         - *pkg_deps_doctools
         - valgrind
 
-  - env: CI_CZMQ_VER=pkg BUILD_TYPE=default-tgt:all
-    os: linux
-    services: docker
-    sudo: false
-    addons:
-      apt:
-        sources: *pkg_src_zeromq_ubuntu12
-        packages:
-        - *pkg_deps_common
-        - *pkg_deps_doctools
-        - *pkg_deps_prereqs_zmq_master
   - env: CI_CZMQ_VER=pkg BUILD_TYPE=default-tgt:install-all
     os: linux
     services: docker
@@ -283,17 +340,6 @@ matrix:
         packages:
         - *pkg_deps_common
         - *pkg_deps_doctools
-        - *pkg_deps_prereqs_zmq_master
-  - env: CI_CZMQ_VER=pkg BUILD_TYPE=default-tgt:memcheck
-    os: linux
-    services: docker
-    sudo: false
-    addons:
-      apt:
-        sources: *pkg_src_zeromq_ubuntu12
-        packages:
-        - *pkg_deps_common
-        - valgrind
         - *pkg_deps_prereqs_zmq_master
   - env: CI_CZMQ_VER=pkg BUILD_TYPE=default-tgt:experimental
     os: linux
