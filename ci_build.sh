@@ -71,7 +71,10 @@ default|"default-tgt:"*)
         done
         echo "`date`: Parallel build attempt seems done" ) &
       PID_SLEEPER=$!
-      wait ${PID_MAKE} ${PID_SLEEPER}
+      RES=0
+      wait ${PID_MAKE} || RES=$?
+      wait ${PID_SLEEPER} || RES=$?
+      exit $RES
     ) || \
     ( echo "==================== PARALLEL ATTEMPT FAILED ($?) =========="
       echo "`date`: Starting the sequential build attempt..."
@@ -94,7 +97,10 @@ default|"default-tgt:"*)
         done
         echo "`date`: Sequential build attempt seems done" ) &
       PID_SLEEPER=$!
-      wait ${PID_MAKE} ${PID_SLEEPER}
+      RES=0
+      wait ${PID_MAKE} || RES=$?
+      wait ${PID_SLEEPER} || RES=$?
+      exit $RES
     )
     echo "=== `date`: BUILDS FINISHED ($?)"
 
