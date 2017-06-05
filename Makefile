@@ -478,18 +478,7 @@ ifeq ($(strip $(CI_CZMQ_VER)),pkg)
     # pre-installed in system areas. If they mismatch our expectations,
     # this means the env is obsolete... or too far in the future ;)
 
-$(BUILD_OBJ_DIR)/libsodium/.prep-newestcommit $(BUILD_OBJ_DIR)/libsodium/.prepped $(BUILD_OBJ_DIR)/libsodium/.autogened \
-$(BUILD_OBJ_DIR)/libsodium/.configured $(BUILD_OBJ_DIR)/libsodium/.built $(BUILD_OBJ_DIR)/libsodium/.installed \
-$(BUILD_OBJ_DIR)/libsodium/.checked $(BUILD_OBJ_DIR)/libsodium/.distchecked $(BUILD_OBJ_DIR)/libsodium/.disted $(BUILD_OBJ_DIR)/libsodium/.memchecked \
-$(BUILD_OBJ_DIR)/libzmq/.prep-newestcommit $(BUILD_OBJ_DIR)/libzmq/.prepped $(BUILD_OBJ_DIR)/libzmq/.autogened \
-$(BUILD_OBJ_DIR)/libzmq/.configured $(BUILD_OBJ_DIR)/libzmq/.built $(BUILD_OBJ_DIR)/libzmq/.installed \
-$(BUILD_OBJ_DIR)/libzmq/.checked $(BUILD_OBJ_DIR)/libzmq/.distchecked $(BUILD_OBJ_DIR)/libzmq/.disted $(BUILD_OBJ_DIR)/libzmq/.memchecked \
-$(BUILD_OBJ_DIR)/czmq/.prep-newestcommit $(BUILD_OBJ_DIR)/czmq/.prepped $(BUILD_OBJ_DIR)/czmq/.autogened \
-$(BUILD_OBJ_DIR)/czmq/.configured $(BUILD_OBJ_DIR)/czmq/.built $(BUILD_OBJ_DIR)/czmq/.installed \
-$(BUILD_OBJ_DIR)/czmq/.checked $(BUILD_OBJ_DIR)/czmq/.distchecked $(BUILD_OBJ_DIR)/czmq/.disted $(BUILD_OBJ_DIR)/czmq/.memchecked \
-$(BUILD_OBJ_DIR)/malamute/.prep-newestcommit $(BUILD_OBJ_DIR)/malamute/.prepped $(BUILD_OBJ_DIR)/malamute/.autogened \
-$(BUILD_OBJ_DIR)/malamute/.configured $(BUILD_OBJ_DIR)/malamute/.built $(BUILD_OBJ_DIR)/malamute/.installed \
-$(BUILD_OBJ_DIR)/malamute/.checked $(BUILD_OBJ_DIR)/malamute/.distchecked $(BUILD_OBJ_DIR)/malamute/.disted $(BUILD_OBJ_DIR)/malamute/.memchecked \
+$(BUILD_OBJ_DIR)/libsodium/.prep-newestcommit $(BUILD_OBJ_DIR)/libsodium/.prepped $(BUILD_OBJ_DIR)/libsodium/.autogened $(BUILD_OBJ_DIR)/libsodium/.configured $(BUILD_OBJ_DIR)/libsodium/.built $(BUILD_OBJ_DIR)/libsodium/.installed $(BUILD_OBJ_DIR)/libsodium/.checked $(BUILD_OBJ_DIR)/libsodium/.distchecked $(BUILD_OBJ_DIR)/libsodium/.disted $(BUILD_OBJ_DIR)/libsodium/.memchecked $(BUILD_OBJ_DIR)/libzmq/.prep-newestcommit $(BUILD_OBJ_DIR)/libzmq/.prepped $(BUILD_OBJ_DIR)/libzmq/.autogened $(BUILD_OBJ_DIR)/libzmq/.configured $(BUILD_OBJ_DIR)/libzmq/.built $(BUILD_OBJ_DIR)/libzmq/.installed $(BUILD_OBJ_DIR)/libzmq/.checked $(BUILD_OBJ_DIR)/libzmq/.distchecked $(BUILD_OBJ_DIR)/libzmq/.disted $(BUILD_OBJ_DIR)/libzmq/.memchecked $(BUILD_OBJ_DIR)/czmq/.prep-newestcommit $(BUILD_OBJ_DIR)/czmq/.prepped $(BUILD_OBJ_DIR)/czmq/.autogened $(BUILD_OBJ_DIR)/czmq/.configured $(BUILD_OBJ_DIR)/czmq/.built $(BUILD_OBJ_DIR)/czmq/.installed $(BUILD_OBJ_DIR)/czmq/.checked $(BUILD_OBJ_DIR)/czmq/.distchecked $(BUILD_OBJ_DIR)/czmq/.disted $(BUILD_OBJ_DIR)/czmq/.memchecked $(BUILD_OBJ_DIR)/malamute/.prep-newestcommit $(BUILD_OBJ_DIR)/malamute/.prepped $(BUILD_OBJ_DIR)/malamute/.autogened $(BUILD_OBJ_DIR)/malamute/.configured $(BUILD_OBJ_DIR)/malamute/.built $(BUILD_OBJ_DIR)/malamute/.installed $(BUILD_OBJ_DIR)/malamute/.checked $(BUILD_OBJ_DIR)/malamute/.distchecked $(BUILD_OBJ_DIR)/malamute/.disted $(BUILD_OBJ_DIR)/malamute/.memchecked \
 	@$(call echo_noop_pkg,$@)
 
 else
@@ -533,6 +522,8 @@ $(ORIGIN_SRC_DIR)/czmq: $(ORIGIN_SRC_DIR)/czmq-master
 	@$(LN_S) $< $@
 
 endif
+
+$(BUILD_OBJ_DIR)/czmq/.prepped $(BUILD_OBJ_DIR)/czmq/.prep-newestcommit: $(ORIGIN_SRC_DIR)/czmq
 
 $(BUILD_OBJ_DIR)/czmq/.configured: $(BUILD_OBJ_DIR)/libzmq/.installed
 

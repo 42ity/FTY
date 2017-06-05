@@ -2,7 +2,7 @@
 
 ################################################################################
 # This file is based on a template used by zproject, but isn't auto-generated. #
-# Building of dependencies (our components and forks of third-party projects   #
+# Building of dependencies (our components and forks of third-party projects)  #
 # in correct order is buried into the Makefile.                                #
 ################################################################################
 
@@ -54,6 +54,7 @@ default|"default-tgt:"*)
 #            echo "`date`: Proceed with general build..."
 #            ;;
 #      esac
+      BLDRES=$?
       $CI_TIME make VERBOSE=0 V=0 -k -j4 "$BUILD_TGT" &
       PID_MAKE=$!
       ( minutes=0
@@ -71,7 +72,10 @@ default|"default-tgt:"*)
         done
         echo "`date`: Parallel build attempt seems done" ) &
       PID_SLEEPER=$!
-      wait ${PID_MAKE} ${PID_SLEEPER}
+      RES=0
+      wait ${PID_MAKE} || RES=$?
+      wait ${PID_SLEEPER} || RES=$?
+      exit $RES
     ) || \
     ( echo "==================== PARALLEL ATTEMPT FAILED ($?) =========="
       echo "`date`: Starting the sequential build attempt..."
@@ -94,9 +98,13 @@ default|"default-tgt:"*)
         done
         echo "`date`: Sequential build attempt seems done" ) &
       PID_SLEEPER=$!
-      wait ${PID_MAKE} ${PID_SLEEPER}
-    )
-    echo "=== `date`: BUILDS FINISHED ($?)"
+      RES=0
+      wait ${PID_MAKE} || RES=$?
+      wait ${PID_SLEEPER} || RES=$?
+      exit $RES
+    ) || \
+    BLDRES=$?
+    echo "=== `date`: BUILDS FINISHED ($BLDRES)"
 
     echo "=== `date`: Are GitIgnores good after 'make $BUILD_TGT'? (should have no output below)"
     git status -s || git status || true
@@ -105,8 +113,10 @@ default|"default-tgt:"*)
         echo "CCache stats after build:"
         ccache -s
     fi
-    echo "=== `date`: Exiting after the custom-build target 'make $BUILD_TGT' succeeded OK"
-    exit 0
+    [ "$BLDRES" = 0 ] && \
+    echo "=== `date`: Exiting after the custom-build target 'make $BUILD_TGT' succeeded OK" || \
+    echo "=== `date`: Exiting after the custom-build target 'make $BUILD_TGT' FAILED with code $BLDRES" >&2
+    exit $BLDRES
     ;;
 bindings)
     pushd "./bindings/${BINDING}" && ./ci_build.sh
