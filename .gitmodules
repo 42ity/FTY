@@ -69,7 +69,7 @@
 [submodule "malamute"]
 	path = malamute
 	url = https://github.com/zeromq/malamute
-	branch = czmq4
+	branch = master
 [submodule "fty-alert-engine"]
 	path = fty-alert-engine
 	url = https://github.com/42ity/fty-alert-engine
@@ -85,7 +85,7 @@
 [submodule "libzmq"]
 	path = libzmq
 	url = https://github.com/zeromq/libzmq
-	branch = czmq4
+	branch = master
 [submodule "czmq-v3.0.2"]
 ### In this branch, we try to use our old frozen fork that is obsoleted in upstream
 	path = czmq-v3.0.2
