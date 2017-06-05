@@ -86,13 +86,16 @@
 	path = libzmq
 	url = https://github.com/zeromq/libzmq
 	branch = czmq4
-[submodule "czmq"]
-	path = czmq
+[submodule "czmq-v3.0.2"]
+### In this branch, we try to use our old frozen fork that is obsoleted in upstream
+	path = czmq-v3.0.2
+	url = https://github.com/42ity/czmq
+	branch = v3.0.2
+[submodule "czmq-master"]
+### In this branch, we try to use upstream instead
+	path = czmq-master
 	url = https://github.com/zeromq/czmq
 	branch = master
-### In this branch, we try to use upstream instead
-#	url = https://github.com/42ity/czmq
-#	branch = v3.0.2
 [submodule "fty-kpi-power-uptime"]
 	path = fty-kpi-power-uptime
 	url = https://github.com/42ity/fty-kpi-power-uptime
