@@ -25,7 +25,16 @@ cache:
 os:
 - linux
 
+# Note: some packages or dependencies may require extended permissions
+# which take longer to set up and boot. If your project does not build
+# in the default container with sudo==false, consider requiring a docker
+# image and/or a newer Ubuntu Trusty baseline VM, by uncommenting below.
+# See the current docs on http://travis-ci.org for up-to-date options.
 sudo: false
+#sudo: required
+
+#dist:
+#- trusty
 
 services:
 - docker
@@ -35,12 +44,7 @@ services:
 # but without such links, every list is complete and unique (meaning that
 # matrix special cases define their own settings, not append to common ones).
 # See https://github.com/travis-ci/travis-ci/issues/3505
-addons:
-  apt:
-    packages: &deps_fty_overall
-    - git
-    - valgrind
-    - ccache
+pkg_deps_prereqs_fty_overall: &pkg_deps_prereqs_fty_overall
     - libcppunit-dev
     - libcppunit-subunit-dev
     - libneon27
@@ -65,8 +69,21 @@ addons:
     - libfreetype6-dev
     - libxpm-dev
     - libxml2-utils
-    - asciidoc
     - xsltproc
+    - uuid-dev
+    - libsasl2-2
+    - libsasl2-dev
+    - sasl2-bin
+    - apport
+    - libmysqlclient-dev
+#   - libsodium-dev
+#   - libsqlite3-dev
+#   - libpq-dev
+#?#   - libmariadbclient-dev
+#?#   - libmariadbd-dev
+
+pkg_deps_doctools: &pkg_deps_doctools
+    - asciidoc
     - xmlto
     - dblatex
     - docbook-xsl
@@ -74,29 +91,222 @@ addons:
     - source-highlight
     - aspell
     - aspell-en
-    - uuid-dev
-    - libsasl2-2
-    - libsasl2-dev
-    - sasl2-bin
-    - apport
-    - libmysqlclient-dev
-#    - libsodium-dev
-#        - libsqlite3-dev
-#        - libpq-dev
-# libmariadbclient-dev libmariadbd-dev ?
 
+pkg_deps_devtools: &pkg_deps_devtools
+    - git
+    - ccache
+
+# For old case - we build our forks or referrals
+#pkg_deps_prereqs_czmq3: &pkg_deps_prereqs_czmq3
+#    - libzmq3-dev
+#    - libczmq-dev
+#    - libmlm-dev
+
+# For new case - we use prepackaged upstream masters
+pkg_deps_prereqs_zmq_master: &pkg_deps_prereqs_zmq_master
+    - libsodium-dev
+    - libzmq5-dev
+    - libczmq-dev
+    - libmlm-dev
+
+pkg_src_zeromq_ubuntu12: &pkg_src_zeromq_ubuntu12
+- sourceline: 'deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-draft/xUbuntu_12.04/ ./'
+  key_url: 'http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-draft/xUbuntu_12.04/Release.key'
+
+pkg_src_zeromq_ubuntu14: &pkg_src_zeromq_ubuntu14
+- sourceline: 'deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-draft/xUbuntu_14.04/ ./'
+  key_url: 'http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-draft/xUbuntu_14.04/Release.key'
+
+# Note: refer to ubuntu14 if you use dist==Trusty for default platform and packaged ZMQ
+addons:
+  apt:
+#    sources: *pkg_src_zeromq_ubuntu12
+    packages: &pkg_deps_common
+    - *pkg_deps_devtools
+    - *pkg_deps_prereqs_fty_overall
+
+# Set CI_TIME=true to enable build-step profiling in Travis
+# Set CI_TRACE=true to enable shell script tracing in Travis
+# Set CI_CONFIG_QUIET=true to enable "configure --quiet" (only report stderr)
 env:
   global:
     - CI_TIME=true
     - CI_TRACE=false
+    - CI_QUIET=true
   matrix:
-    - BUILD_TYPE=default-tgt:all
-    - BUILD_TYPE=default-tgt:install-all
-    - BUILD_TYPE=default-tgt:check
-    - BUILD_TYPE=default-tgt:dist
-    - BUILD_TYPE=default-tgt:distcheck
-    - BUILD_TYPE=default-tgt:memcheck
-    - BUILD_TYPE=default-tgt:experimental
+    - CI_CZMQ_VER=3 BUILD_TYPE=default-tgt:all
+    - CI_CZMQ_VER=3 BUILD_TYPE=default-tgt:install-all
+    - CI_CZMQ_VER=3 BUILD_TYPE=default-tgt:check
+    - CI_CZMQ_VER=3 BUILD_TYPE=default-tgt:dist
+    - CI_CZMQ_VER=3 BUILD_TYPE=default-tgt:distcheck
+
+# Note: this matrix currently assumes that "CI_CZMQ_VER=4" means builds
+# against upstream/master from github, and "CI_CZMQ_VER=3" means usage
+# of our legacy forked variant based on "czmq-v3.0.2" also from github,
+# and "CI_CZMQ_VER=pkg" means usage of pre-packaged binaries from upstream.
+# In either of the source builds, the libsodium, libzmq and malamute are
+# from respective upstream/master's.
+matrix:
+  include:
+  - env: CI_CZMQ_VER=3 BUILD_TYPE=default-tgt:memcheck
+    os: linux
+    services: docker
+    sudo: false
+    addons:
+      apt:
+        packages:
+        - *pkg_deps_common
+        - valgrind
+  - env: CI_CZMQ_VER=3 BUILD_TYPE=default-tgt:experimental
+    os: linux
+    services: docker
+    sudo: false
+    addons:
+      apt:
+        packages:
+        - *pkg_deps_common
+        - *pkg_deps_doctools
+        - valgrind
+
+  - env: CI_CZMQ_VER=4 BUILD_TYPE=default-tgt:all
+    os: linux
+    services: docker
+    sudo: false
+    addons:
+      apt:
+        packages:
+        - *pkg_deps_common
+        - *pkg_deps_doctools
+  - env: CI_CZMQ_VER=4 BUILD_TYPE=default-tgt:install-all
+    os: linux
+    services: docker
+    sudo: false
+    addons:
+      apt:
+        packages:
+        - *pkg_deps_common
+        - *pkg_deps_doctools
+  - env: CI_CZMQ_VER=4 BUILD_TYPE=default-tgt:check
+    os: linux
+    services: docker
+    sudo: false
+    addons:
+      apt:
+        packages:
+        - *pkg_deps_common
+  - env: CI_CZMQ_VER=4 BUILD_TYPE=default-tgt:dist
+    os: linux
+    services: docker
+    sudo: false
+    addons:
+      apt:
+        packages:
+        - *pkg_deps_common
+  - env: CI_CZMQ_VER=4 BUILD_TYPE=default-tgt:distcheck
+    os: linux
+    services: docker
+    sudo: false
+    addons:
+      apt:
+        packages:
+        - *pkg_deps_common
+        - *pkg_deps_doctools
+  - env: CI_CZMQ_VER=4 BUILD_TYPE=default-tgt:memcheck
+    os: linux
+    services: docker
+    sudo: false
+    addons:
+      apt:
+        packages:
+        - *pkg_deps_common
+        - valgrind
+  - env: CI_CZMQ_VER=4 BUILD_TYPE=default-tgt:experimental
+    os: linux
+    services: docker
+    sudo: false
+    addons:
+      apt:
+        packages:
+        - *pkg_deps_common
+        - *pkg_deps_doctools
+        - valgrind
+
+  - env: CI_CZMQ_VER=pkg BUILD_TYPE=default-tgt:all
+    os: linux
+    services: docker
+    sudo: false
+    addons:
+      apt:
+        sources: *pkg_src_zeromq_ubuntu12
+        packages:
+        - *pkg_deps_common
+        - *pkg_deps_doctools
+        - *pkg_deps_prereqs_zmq_master
+  - env: CI_CZMQ_VER=pkg BUILD_TYPE=default-tgt:install-all
+    os: linux
+    services: docker
+    sudo: false
+    addons:
+      apt:
+        sources: *pkg_src_zeromq_ubuntu12
+        packages:
+        - *pkg_deps_common
+        - *pkg_deps_doctools
+        - *pkg_deps_prereqs_zmq_master
+  - env: CI_CZMQ_VER=pkg BUILD_TYPE=default-tgt:check
+    os: linux
+    services: docker
+    sudo: false
+    addons:
+      apt:
+        sources: *pkg_src_zeromq_ubuntu12
+        packages:
+        - *pkg_deps_common
+        - *pkg_deps_prereqs_zmq_master
+  - env: CI_CZMQ_VER=pkg BUILD_TYPE=default-tgt:dist
+    os: linux
+    services: docker
+    sudo: false
+    addons:
+      apt:
+        sources: *pkg_src_zeromq_ubuntu12
+        packages:
+        - *pkg_deps_common
+        - *pkg_deps_prereqs_zmq_master
+  - env: CI_CZMQ_VER=pkg BUILD_TYPE=default-tgt:distcheck
+    os: linux
+    services: docker
+    sudo: false
+    addons:
+      apt:
+        sources: *pkg_src_zeromq_ubuntu12
+        packages:
+        - *pkg_deps_common
+        - *pkg_deps_doctools
+        - *pkg_deps_prereqs_zmq_master
+  - env: CI_CZMQ_VER=pkg BUILD_TYPE=default-tgt:memcheck
+    os: linux
+    services: docker
+    sudo: false
+    addons:
+      apt:
+        sources: *pkg_src_zeromq_ubuntu12
+        packages:
+        - *pkg_deps_common
+        - valgrind
+        - *pkg_deps_prereqs_zmq_master
+  - env: CI_CZMQ_VER=pkg BUILD_TYPE=default-tgt:experimental
+    os: linux
+    services: docker
+    sudo: false
+    addons:
+      apt:
+        sources: *pkg_src_zeromq_ubuntu12
+        packages:
+        - *pkg_deps_common
+        - *pkg_deps_doctools
+        - *pkg_deps_prereqs_zmq_master
+        - valgrind
 
 before_install:
 - date; echo Syncing Git repos...

@@ -41,6 +41,11 @@ BUILD_ARCH ?= $(shell uname -m)
 ARCH=$(BUILD_ARCH)
 export ARCH
 
+# Current legacy default, and something to have definite recipe behavior
+ifeq ($(strip $(CI_CZMQ_VER)),)
+CI_CZMQ_VER ?= 3
+endif
+
 # $(abs_srcdir) defaults to location of this Makefile (and accompanying sources)
 # Can override on command-line if needed for any reason, for example
 #   cd /tmp/bld-fty && make -f ~/FTY/Makefile abs_srcdir=~/FTY/ all
@@ -55,14 +60,14 @@ ORIGIN_SRC_DIR ?= $(abs_srcdir)
 # sources live, as a a wipable local git clone of those submodules to
 # support the multi-host builds from same source checkout (autoreconf
 # changes the source tree and so depends on tools available on the host).
-BUILD_SRC_DIR ?= $(abs_builddir)/.srcclone/$(BUILD_OS)-$(BUILD_ARCH)
+BUILD_SRC_DIR ?= $(abs_builddir)/.srcclone/$(BUILD_OS)-$(BUILD_ARCH)-czmq_$(CI_CZMQ_VER)
 
 # Subdirectory where out-of-tree builds happen (with a sub-dir per
 # component where object files and other products are created). For a
 # few components this is effectively used as their BUILD_SRC_DIR too
 # (e.g. those that are not managed by autotools and so do not easily
 # support out-of-tree builds).
-BUILD_OBJ_DIR ?= $(abs_builddir)/.build/$(BUILD_OS)-$(BUILD_ARCH)
+BUILD_OBJ_DIR ?= $(abs_builddir)/.build/$(BUILD_OS)-$(BUILD_ARCH)-czmq_$(CI_CZMQ_VER)
 
 # Root dir where tools are installed into (using their default paths inside)
 # We also do use some of those tools (e.g. GSL) during further builds.
@@ -337,6 +342,10 @@ define echo_noop
 	( echo "  NOOP    Generally recipe for $@ has nothing to do" ; $(TOUCH) $@ )
 endef
 
+define echo_noop_pkg
+	( echo "  NOOP    Generally recipe for $@ has nothing to do because dependency is used pre-packaged" ; @(MKDIR_P) $(@D); $(TOUCH) $@ )
+endef
+
 CFLAGS ?=
 CPPFLAGS ?=
 CXXFLAGS ?=
@@ -457,21 +466,56 @@ PREP_TYPE_libmagic = clonetar-src
 $(BUILD_OBJ_DIR)/libmagic/.memchecked: $(BUILD_OBJ_DIR)/libmagic/.built
 	@$(call echo_noop,$@)
 
-COMPONENTS_FTY += libsodium
+
+ifeq ($(strip $(CI_CZMQ_VER)),pkg)
+#    COMPONENTS_FTY += libsodium
+#    COMPONENTS_FTY += libzmq
+#    COMPONENTS_FTY += czmq
+#    COMPONENTS_FTY += malamute
+
+    # In case of "pkg" which stands for using the upstream packages we
+    # have nothing to build - the env (e.g. Travis) should provide them
+    # pre-installed in system areas. If they mismatch our expectations,
+    # this means the env is obsolete... or too far in the future ;)
+
+$(BUILD_OBJ_DIR)/libsodium/.prep-newestcommit $(BUILD_OBJ_DIR)/libsodium/.prepped $(BUILD_OBJ_DIR)/libsodium/.autogened \
+$(BUILD_OBJ_DIR)/libsodium/.configured $(BUILD_OBJ_DIR)/libsodium/.built $(BUILD_OBJ_DIR)/libsodium/.installed \
+$(BUILD_OBJ_DIR)/libsodium/.checked $(BUILD_OBJ_DIR)/libsodium/.distchecked $(BUILD_OBJ_DIR)/libsodium/.disted $(BUILD_OBJ_DIR)/libsodium/.memchecked \
+$(BUILD_OBJ_DIR)/libzmq/.prep-newestcommit $(BUILD_OBJ_DIR)/libzmq/.prepped $(BUILD_OBJ_DIR)/libzmq/.autogened \
+$(BUILD_OBJ_DIR)/libzmq/.configured $(BUILD_OBJ_DIR)/libzmq/.built $(BUILD_OBJ_DIR)/libzmq/.installed \
+$(BUILD_OBJ_DIR)/libzmq/.checked $(BUILD_OBJ_DIR)/libzmq/.distchecked $(BUILD_OBJ_DIR)/libzmq/.disted $(BUILD_OBJ_DIR)/libzmq/.memchecked \
+$(BUILD_OBJ_DIR)/czmq/.prep-newestcommit $(BUILD_OBJ_DIR)/czmq/.prepped $(BUILD_OBJ_DIR)/czmq/.autogened \
+$(BUILD_OBJ_DIR)/czmq/.configured $(BUILD_OBJ_DIR)/czmq/.built $(BUILD_OBJ_DIR)/czmq/.installed \
+$(BUILD_OBJ_DIR)/czmq/.checked $(BUILD_OBJ_DIR)/czmq/.distchecked $(BUILD_OBJ_DIR)/czmq/.disted $(BUILD_OBJ_DIR)/czmq/.memchecked \
+$(BUILD_OBJ_DIR)/malamute/.prep-newestcommit $(BUILD_OBJ_DIR)/malamute/.prepped $(BUILD_OBJ_DIR)/malamute/.autogened \
+$(BUILD_OBJ_DIR)/malamute/.configured $(BUILD_OBJ_DIR)/malamute/.built $(BUILD_OBJ_DIR)/malamute/.installed \
+$(BUILD_OBJ_DIR)/malamute/.checked $(BUILD_OBJ_DIR)/malamute/.distchecked $(BUILD_OBJ_DIR)/malamute/.disted $(BUILD_OBJ_DIR)/malamute/.memchecked \
+	@$(call echo_noop_pkg,$@)
+
+else
+    # CI_CZMQ_VER not specified, or "3" (or "4" quietly)
+
+    COMPONENTS_FTY += libsodium
 $(BUILD_OBJ_DIR)/libsodium/.memchecked: $(BUILD_OBJ_DIR)/libsodium/.built
 	@$(call echo_noop,$@)
 
-COMPONENTS_FTY += libzmq
-PREP_TYPE_libzmq = clonetar-src
+    COMPONENTS_FTY += libzmq
+    PREP_TYPE_libzmq = clonetar-src
 $(BUILD_OBJ_DIR)/libzmq/.configured: $(BUILD_OBJ_DIR)/libsodium/.installed
 # TODO: It was called "make check-valgrind-memcheck" back then
 $(BUILD_OBJ_DIR)/libzmq/.memchecked: $(BUILD_OBJ_DIR)/libzmq/.built
 	@$(call echo_noop,$@)
 
-COMPONENTS_FTY += czmq
-CONFIG_OPTS_czmq ?= CFLAGS="$(CFLAGS) -Wno-deprecated-declarations"
-CONFIG_OPTS_czmq += CXXFLAGS="$(CXXFLAGS) -Wno-deprecated-declarations"
-CONFIG_OPTS_czmq += CPPFLAGS="$(CPPFLAGS) -Wno-deprecated-declarations"
+    COMPONENTS_FTY += czmq
+ifeq ($(strip $(CI_CZMQ_VER)),3)
+
+$(ORIGIN_SRC_DIR)/czmq: $(ORIGIN_SRC_DIR)/czmq-v3.0.2
+	@$(RM) $@
+	@$(LN_S) $< $@
+
+    CONFIG_OPTS_czmq ?= CFLAGS="$(CFLAGS) -Wno-deprecated-declarations"
+    CONFIG_OPTS_czmq += CXXFLAGS="$(CXXFLAGS) -Wno-deprecated-declarations"
+    CONFIG_OPTS_czmq += CPPFLAGS="$(CPPFLAGS) -Wno-deprecated-declarations"
 # Make sure the workspace is (based on) branch "v3.0.2" at this time
 # That version of czmq autogen.sh requires a "libtool" while debian has
 # only "libtoolize", so fall back if needed.
@@ -481,10 +525,22 @@ $(BUILD_OBJ_DIR)/czmq/.autogened: $(BUILD_OBJ_DIR)/czmq/.prepped
 	   && autoreconf -fiv )
 	$(TOUCH) $@
 
+else
+    # Note: this currently assumes that "CI_CZMQ_VER=4" means upstream/master
+
+$(ORIGIN_SRC_DIR)/czmq: $(ORIGIN_SRC_DIR)/czmq-master
+	@$(RM) $@
+	@$(LN_S) $< $@
+
+endif
+
 $(BUILD_OBJ_DIR)/czmq/.configured: $(BUILD_OBJ_DIR)/libzmq/.installed
 
-COMPONENTS_FTY += malamute
+
+    COMPONENTS_FTY += malamute
 $(BUILD_OBJ_DIR)/malamute/.configured: $(BUILD_OBJ_DIR)/czmq/.installed $(BUILD_OBJ_DIR)/libsodium/.installed
+
+endif
 
 COMPONENTS_FTY += nut
 CONFIG_OPTS_nut ?= --with-doc=skip
@@ -707,6 +763,9 @@ clean-src/%:
 	 else \
 	    echo "  NOOP    Generally $@ has nothing to do for now"; \
 	 fi
+	@if test x"$(@F)" = x"czmq" && -L "$(ORIGIN_SRC_DIR)/$(@F)" ; then \
+	    $(RM) "$(ORIGIN_SRC_DIR)/$(@F)" ; \
+	 else true; fi
 
 distclean/% clean/%:
 	$(MAKE) clean-obj/$(@F)
