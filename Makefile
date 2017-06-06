@@ -343,7 +343,7 @@ define echo_noop
 endef
 
 define echo_noop_pkg
-	( echo "  NOOP    Generally recipe for $@ has nothing to do because dependency is used pre-packaged" ; @(MKDIR) $(@D); $(TOUCH) $@ )
+	( echo "  NOOP    Generally recipe for $@ has nothing to do because dependency is used pre-packaged" ; $(MKDIR) $(@D); $(TOUCH) $@ )
 endef
 
 CFLAGS ?=
