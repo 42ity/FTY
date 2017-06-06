@@ -886,6 +886,8 @@ reinstall-fty-experimental:
 	@echo "COMPLETED $@ : made '$^'"
 
 wipe mrproper:
+	if [ -d $(BUILD_SRC_DIR) ] ; then chmod -R u+w $(BUILD_SRC_DIR) ; fi
+	if [ -d $(BUILD_OBJ_DIR) ] ; then chmod -R u+w $(BUILD_OBJ_DIR) ; fi
 	$(RMDIR) $(BUILD_SRC_DIR) $(BUILD_OBJ_DIR)
 	case "$(INSTDIR)" in \
 	    $(abs_builddir)/.install/*)  $(RMDIR) $(INSTDIR) ;; \
