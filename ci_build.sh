@@ -30,7 +30,14 @@ case "$BUILD_TYPE" in
 default|"default-tgt:"*)
     LANG=C
     LC_ALL=C
-    export LANG LC_ALL
+    TZ=UTC
+    export LANG LC_ALL TZ
+
+    # Empirical time limit is about 49 minutes, but we want some slack for rare checks
+    # and to have time to roll up ccache etc. to run this job faster next time.
+    # Also, package installation etc. is also part of timed overhead...
+    _TRAVIS_TIMELIMIT="$(expr 45 \* 60)"
+    _TS_START="$(date -u +%s)"
 
     # Build and check this project; note that zprojects always have an autogen.sh
     [ -z "$CI_TIME" ] || echo "`date`: Starting build of currently tested project..."
@@ -61,8 +68,9 @@ default|"default-tgt:"*)
         limit=29
         while kill -0 ${PID_MAKE} >/dev/null 2>&1 ; do
           printf ' \b' # Hidden print to keep the logs ticking
-          if [ "$minutes" -ge "$limit" ]; then
-            echo "`date`: Parallel build timed out over $limit minutes" >&2
+          _TS_NOW="$(date -u +%s)"
+          if [ "$minutes" -ge "$limit" ] || [ "$(expr ${_TS_NOW} - ${_TS_START} )" -gt "${_TRAVIS_TIMELIMIT}" ]; then
+            echo "`date`: Parallel build timed out over $limit minutes, or total job time is nearing the limit" >&2
             kill -15 ${PID_MAKE}
             sleep 5
             exit 1
@@ -87,8 +95,9 @@ default|"default-tgt:"*)
         limit=29
         while kill -0 ${PID_MAKE} >/dev/null 2>&1 ; do
           printf ' \b' # Hidden print to keep the logs ticking
-          if [ "$minutes" -ge "$limit" ]; then
-            echo "`date`: Sequential build timed out over $limit minutes" >&2
+          _TS_NOW="$(date -u +%s)"
+          if [ "$minutes" -ge "$limit" ] || [ "$(expr ${_TS_NOW} - ${_TS_START} )" -gt "${_TRAVIS_TIMELIMIT}" ]; then
+            echo "`date`: Sequential build timed out over $limit minutes, or total job time is nearing the limit" >&2
             kill -15 ${PID_MAKE}
             sleep 5
             exit 1
