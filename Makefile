@@ -507,7 +507,7 @@ ifeq ($(strip $(CI_CZMQ_VER)),3)
 # Make sure the workspace is (based on) branch "v3.0.2" at this time
 # That version of czmq autogen.sh requires a "libtool" while debian has
 # only "libtoolize", so fall back if needed.
-$(BUILD_OBJ_DIR)/czmq/.autogened: $(BUILD_OBJ_DIR)/czmq/.prepped
+$(BUILD_OBJ_DIR)/$(COMPONENT_CZMQ)/.autogened: $(BUILD_OBJ_DIR)/$(COMPONENT_CZMQ)/.prepped
 	+$(call autogen_sub,$(notdir $(@D))) || \
 	 ( cd "$(BUILD_SRC_DIR)/$(notdir $(@D))/$(BUILD_SUB_DIR_$(notdir $(@D)))" \
 	   && autoreconf -fiv )
