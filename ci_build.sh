@@ -54,7 +54,7 @@ default|"default-tgt:"*)
 #            echo "`date`: Proceed with general build..."
 #            ;;
 #      esac
-      BLDRES=$?
+      BLDRES=255
       $CI_TIME make VERBOSE=0 V=0 -k -j4 "$BUILD_TGT" &
       PID_MAKE=$!
       ( minutes=0
@@ -102,7 +102,8 @@ default|"default-tgt:"*)
       wait ${PID_MAKE} || RES=$?
       wait ${PID_SLEEPER} || RES=$?
       exit $RES
-    ) || \
+    ) && \
+    BLDRES=0 || \
     BLDRES=$?
     echo "=== `date`: BUILDS FINISHED ($BLDRES)"
 
