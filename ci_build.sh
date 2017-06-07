@@ -90,7 +90,13 @@ default|"default-tgt:"*)
       wait ${PID_SLEEPER} || RES=$?
       exit $RES
     ) || \
-    ( echo "==================== PARALLEL ATTEMPT FAILED ($?) =========="
+    ( RES=$?
+      echo "==================== PARALLEL ATTEMPT FAILED ($RES) =========="
+      _TS_NOW="$(date -u +%s)"
+      if [ "$(expr ${_TS_NOW} - ${_TS_START} )" -gt "${_TRAVIS_TIMELIMIT}" ]; then
+        echo "`date`: total job time is nearing the limit, not starting the sequential build" >&2
+        exit $RES
+      fi
       echo "`date`: Starting the sequential build attempt..."
       # Avoiding travis_wait() and build timeouts during tests
       # thanks to comments in Travis-CI issue #4190
