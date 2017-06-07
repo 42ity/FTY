@@ -87,7 +87,9 @@ default|"default-tgt:"*)
       PID_SLEEPER=$!
       RES=0
       wait ${PID_MAKE} || RES=$?
+      echo "`date`: PID_MAKE has finished, now RES=$RES"
       wait ${PID_SLEEPER} || RES=$?
+      echo "`date`: PID_SLEEPER has finished, now RES=$RES"
       exit $RES
     ) || \
     ( RES=$?
@@ -126,7 +128,9 @@ default|"default-tgt:"*)
       PID_SLEEPER=$!
       RES=0
       wait ${PID_MAKE} || RES=$?
+      echo "`date`: PID_MAKE has finished, now RES=$RES"
       wait ${PID_SLEEPER} || RES=$?
+      echo "`date`: PID_SLEEPER has finished, now RES=$RES"
       exit $RES
     ) && \
     BLDRES=0 || \
