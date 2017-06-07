@@ -528,6 +528,7 @@ endif
     COMPONENTS_FTY += $(COMPONENT_CZMQ)
 
 %/czmq: %/$(COMPONENT_CZMQ)
+	@true
 
 $(ORIGIN_SRC_DIR)/czmq: $(ORIGIN_SRC_DIR)/$(COMPONENT_CZMQ)
 	@$(RM) $@
