@@ -67,7 +67,7 @@ default|"default-tgt:"*)
       ( minutes=0
         ticks=0
         limit=29
-        while kill -0 ${PID_MAKE} >/dev/null 2>&1 ; do
+        while [ -d /proc/${PID_MAKE}/fd ] ; do
           printf ' \b' # Hidden print to keep the logs ticking
           _TS_NOW="$(date -u +%s)"
           if [ "$minutes" -ge "$limit" ] || [ "$(expr ${_TS_NOW} - ${_TS_START} )" -gt "${_TRAVIS_TIMELIMIT}" ]; then
@@ -105,7 +105,8 @@ default|"default-tgt:"*)
       ( minutes=0
         ticks=0
         limit=29
-        while kill -0 ${PID_MAKE} >/dev/null 2>&1 ; do
+#        while kill -0 ${PID_MAKE} >/dev/null 2>&1 ; do
+        while [ -d /proc/${PID_MAKE}/fd ] ; do
           printf ' \b' # Hidden print to keep the logs ticking
           _TS_NOW="$(date -u +%s)"
           if [ "$minutes" -ge "$limit" ] || [ "$(expr ${_TS_NOW} - ${_TS_START} )" -gt "${_TRAVIS_TIMELIMIT}" ]; then
