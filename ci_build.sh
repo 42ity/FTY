@@ -65,6 +65,7 @@ default|"default-tgt:"*)
       $CI_TIME make VERBOSE=0 V=0 -k -j4 "$BUILD_TGT" &
       PID_MAKE=$!
       ( minutes=0
+        ticks=0
         limit=29
         while kill -0 ${PID_MAKE} >/dev/null 2>&1 ; do
           printf ' \b' # Hidden print to keep the logs ticking
@@ -75,8 +76,12 @@ default|"default-tgt:"*)
             sleep 5
             exit 1
           fi
-          minutes="$(expr $minutes + 1)"
-          sleep 60
+          ticks="$(expr $ticks + 1)"
+          if [ "$ticks" = 12 ] ; then
+            minutes="$(expr $minutes + 1)"
+            ticks=0
+          fi
+          sleep 5
         done
         echo "`date`: Parallel build attempt seems done" ) &
       PID_SLEEPER=$!
@@ -92,6 +97,7 @@ default|"default-tgt:"*)
       $CI_TIME make VERBOSE=1 "$BUILD_TGT" &
       PID_MAKE=$!
       ( minutes=0
+        ticks=0
         limit=29
         while kill -0 ${PID_MAKE} >/dev/null 2>&1 ; do
           printf ' \b' # Hidden print to keep the logs ticking
@@ -102,8 +108,12 @@ default|"default-tgt:"*)
             sleep 5
             exit 1
           fi
-          minutes="$(expr $minutes + 1)"
-          sleep 60
+          ticks="$(expr $ticks + 1)"
+          if [ "$ticks" = 12 ] ; then
+            minutes="$(expr $minutes + 1)"
+            ticks=0
+          fi
+          sleep 5
         done
         echo "`date`: Sequential build attempt seems done" ) &
       PID_SLEEPER=$!
