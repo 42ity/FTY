@@ -72,6 +72,7 @@ default|"default-tgt:"*)
           _TS_NOW="$(date -u +%s)"
           if [ "$minutes" -ge "$limit" ] || [ "$(expr ${_TS_NOW} - ${_TS_START} )" -gt "${_TRAVIS_TIMELIMIT}" ]; then
             echo "`date`: Parallel build timed out over $limit minutes, or total job time is nearing the limit" >&2
+            ps -ef
             kill -15 ${PID_MAKE}
             sleep 5
             exit 1
@@ -113,6 +114,7 @@ default|"default-tgt:"*)
           _TS_NOW="$(date -u +%s)"
           if [ "$minutes" -ge "$limit" ] || [ "$(expr ${_TS_NOW} - ${_TS_START} )" -gt "${_TRAVIS_TIMELIMIT}" ]; then
             echo "`date`: Sequential build timed out over $limit minutes, or total job time is nearing the limit" >&2
+            ps -ef
             kill -15 ${PID_MAKE}
             sleep 5
             exit 1
