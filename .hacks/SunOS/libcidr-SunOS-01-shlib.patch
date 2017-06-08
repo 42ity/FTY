@@ -1,0 +1,26 @@
+diff --git a/src/GNUmakefile.inc b/src/GNUmakefile.inc
+index 4df45d7..e82b1e7 100644
+--- a/src/GNUmakefile.inc
++++ b/src/GNUmakefile.inc
+@@ -49,7 +49,7 @@ def: all
+ 
+ ${SHLIB_NAME}: ${SO_FILES}
+ 	@echo Linking ${SHLIB_NAME}...
+-	${CC} -shared -Wl,-x -o ${@} -Wl,-soname,${SHLIB_NAME} \
++	${CC} -shared -o ${@} -Wl,-soname,${SHLIB_NAME} \
+ 			`${LORDER} ${SO_FILES} | ${TSORT}`
+ 	${LN} -sf ${SHLIB_NAME} ${SHLIB_LINK}
+ 
+diff --git a/src/Makefile.inc b/src/Makefile.inc
+index 653357b..8f803e8 100644
+--- a/src/Makefile.inc
++++ b/src/Makefile.inc
+@@ -45,7 +45,7 @@ def: all
+ 
+ ${SHLIB_NAME}: ${SO_FILES}
+ 	@echo Linking ${SHLIB_NAME}...
+-	${CC} -shared -Wl,-x -o ${@} -Wl,-soname,${SHLIB_NAME} \
++	${CC} -shared -o ${@} -Wl,-soname,${SHLIB_NAME} \
+ 			`${LORDER} ${SO_FILES} | ${TSORT}`
+ 	${LN} -sf ${SHLIB_NAME} ${SHLIB_LINK}
+ 

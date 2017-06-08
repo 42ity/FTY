@@ -132,3 +132,7 @@
 	path = fty-mdns-sd
 	url = https://github.com/jimklimov/fty-mdns-sd
 	branch = czmq4
+[submodule "fty-discovery"]
+	path = fty-discovery
+	url = https://github.com/jimklimov/fty-discovery
+	branch = czmq4

@@ -53,8 +53,12 @@ and `pkg` for OS packages of the whole `libsodium`+`libzmq`+`czmq`+`malamute`
 stack.
 
 This `Makefile` has been verified on Debian 8 (devel images for the project
-build farm); feel free to update the recipes if needed for other OSes and
-distros.
+build farm); it also passes on Ubuntu-based systems used in the Travis CI
+cloud. Much but not all of this code can also build under OpenIndiana, more
+with a purpose to test the approach to portability than to use it there (in
+the near term at least). Feel free to update the recipes if needed for other
+OSes and distros, and take inspiration from hooks made for and used by the
+OpenIndiana/SunOS integration.
 
 == Fetching all current sources and updating the HEADs
 
@@ -93,9 +97,20 @@ or (to specify a default non-`master` branch right away):
 :; git submodule add -b 42ity https://github.com/42ity/third-party-fork
 ----
 
-Note that after adding sources a submodule, you'd likely want to reference
+Note that after adding sources for a submodule, you'd likely want to reference
 its place in the dependency chain for the `Makefile` of this FTY workspace
-as well.
+as well (perhaps among `COMPONENTS_FTY_EXPERIMENTAL` first, for skeleton
+component directories). Don't forget to `git add` both the updated `Makefile`
+and the new component directory, and to set up your own developer fork for it
+as detailed below.
+
+If the new component delivers `systemd` services that should be manageable
+as part of the 42ITy(TM) product, consider updating the list of recognized
+services used in `fty-core::tools/systemd` and in `fty-rest::systemctl.ecpp`.
+
+Finally, although orthogonal to updating this repository, don't forget to
+enable Travis CI for the new component and add or update some corresponding
+recipes on your build farm, if any.
 
 == Changing tracked repository data
 

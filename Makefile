@@ -619,6 +619,12 @@ $(BUILD_OBJ_DIR)/fty-example/.configured: $(BUILD_OBJ_DIR)/fty-proto/.installed
 COMPONENTS_FTY += fty-alert-flexible
 $(BUILD_OBJ_DIR)/fty-alert-flexible/.configured: $(BUILD_OBJ_DIR)/fty-proto/.installed
 
+COMPONENTS_FTY += fty-info
+$(BUILD_OBJ_DIR)/fty-info/.configured: $(BUILD_OBJ_DIR)/fty-proto/.installed $(BUILD_OBJ_DIR)/cxxtools/.installed $(BUILD_OBJ_DIR)/tntdb/.installed
+
+COMPONENTS_FTY += fty-mdns-sd
+$(BUILD_OBJ_DIR)/fty-mdns-sd/.configured: $(BUILD_OBJ_DIR)/fty-proto/.installed
+
 ### Note: The following components are experimental recent additions,
 ### and in their current state they break FTY builds (and they do not
 ### yet do anything useful). So while this Makefile supports a basic
@@ -627,11 +633,8 @@ $(BUILD_OBJ_DIR)/fty-alert-flexible/.configured: $(BUILD_OBJ_DIR)/fty-proto/.ins
 COMPONENTS_FTY_EXPERIMENTAL += fty-metric-snmp
 $(BUILD_OBJ_DIR)/fty-metric-snmp/.configured: $(BUILD_OBJ_DIR)/fty-proto/.installed
 
-COMPONENTS_FTY_EXPERIMENTAL += fty-info
-$(BUILD_OBJ_DIR)/fty-info/.configured: $(BUILD_OBJ_DIR)/fty-proto/.installed $(BUILD_OBJ_DIR)/cxxtools/.installed $(BUILD_OBJ_DIR)/tntdb/.installed
-
-COMPONENTS_FTY_EXPERIMENTAL += fty-mdns-sd
-$(BUILD_OBJ_DIR)/fty-mdns-sd/.configured: $(BUILD_OBJ_DIR)/fty-proto/.installed
+COMPONENTS_FTY_EXPERIMENTAL += fty-discovery
+$(BUILD_OBJ_DIR)/fty-discovery/.configured: $(BUILD_OBJ_DIR)/fty-proto/.installed
 
 COMPONENTS_ALL += $(COMPONENTS_FTY)
 
