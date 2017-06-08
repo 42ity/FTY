@@ -31,6 +31,27 @@ whic our project does not modify (such as MySQL/MariaDB libraries to link
 against, or lua-5.1/5.2, etc.), as well as to completely check out the
 source code to build.
 
+Note that as part of the project's evolution and legacy, it used to require
+the `czmq` version 3.0.2, and since that release was obsoleted by upstream
+a while ago, we tracked our own fork with small fixes. Subsequently the code
+of 42ITy(TM) components where it mattered was updated to support either the
+CZMQ3 or CZMQ4 APIs, and now the `Makefile` in this repository allows to
+automate the builds against either our `czmq-v3.0.2` fork or the upstream
+`czmq-master` from the GitHub, or using binary packages of zeromq stack
+as provided in your OS by other means (beware that these can lag behind
+respective upstream/master or upstream/stable branches and so can lack
+the features that 42ITy codebase might need). Our current goal is to drop
+the requirement of the obsoleted version and use the community-supported
+master branch, where we can collaborate on fixes for bugs that bite us all.
+
+To choose the `czmq` version to build your FTY components against, you can
+define the `CI_CZMQ_VER=<value>` (as an exported environment variable, or
+as a `make` argument); suported values are `3` for our czmq-v3.0.2 fork
+(it is also the default choice if no value is set explicitly), `4` for
+the upstream/master which is currently under the 4.x umbrella versions,
+and `pkg` for OS packages of the whole `libsodium`+`libzmq`+`czmq`+`malamute`
+stack.
+
 This `Makefile` has been verified on Debian 8 (devel images for the project
 build farm); feel free to update the recipes if needed for other OSes and
 distros.
