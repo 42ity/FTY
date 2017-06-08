@@ -27,7 +27,7 @@ the customized third-party projects, in the order of dependencies. It is
 ready for correct parallel compilation with GNU Make 3.81 or newer, and can
 take advantage of `ccache` if available on your system. It is up to the
 developer to provide an environment with appropriate third-party software
-whic our project does not modify (such as MySQL/MariaDB libraries to link
+which our project does not modify (such as MySQL/MariaDB libraries to link
 against, or lua-5.1/5.2, etc.), as well as to completely check out the
 source code to build.
 
@@ -60,8 +60,13 @@ distros.
 
 Note that when you initially check out a clone of this repository, you only
 get meta-data. To instantiate (or subsequently update) the actual source
-code for the components as well as to update the reference to Git HEADs of
-the referenced components, run `./sync.sh` in this workspace.
+code for the components, as well as to update the reference to Git HEADs of
+the referenced components, run the `./sync.sh` script in this workspace.
+
+NOTE: If you intend not only to build the unmodified 42ITy codebase, but to
+also collaborate about changes and improvements, see the chapter below about
+setting up your forks on GitHub and how to automate definition of references
+to both your "origin" fork and our common "upstream" repository.
 
 NOTE: In order for updates from the common codebase to come without conflicts,
 never work in a `master` branch (or other preferred branch in certain repos)!
