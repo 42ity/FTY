@@ -136,3 +136,7 @@
 	path = fty-discovery
 	url = https://github.com/jimklimov/fty-discovery
 	branch = czmq4
+[submodule "fty-sensor-gpio"]
+	path = fty-sensor-gpio
+	url = https://github.com/jimklimov/fty-sensor-gpio
+	branch = czmq4

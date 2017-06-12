@@ -27,6 +27,7 @@ install: install-fty
 uninstall: uninstall-all uninstall-fty-experimental
 clean: clean-all clean-fty-experimental
 check: check-all
+check-verbose: check-verbose-all
 dist: dist-all
 distclean: distclean-all
 distcheck: distcheck-all
@@ -129,7 +130,7 @@ COMPONENTS_FTY_EXPERIMENTAL =
 # */.prepped */.autogened */.configured */.built */.installed
 # NOTE/TODO: Get this to work with explicit list of patterns to filenames
 .SECONDARY:
-#.PRECIOUS: %/.prep-newestcommit %/.prepped %/.autogened %/.configured %/.built %/.installed %/.checked %/.distchecked %/.disted %/.memchecked
+#.PRECIOUS: %/.prep-newestcommit %/.prepped %/.autogened %/.configured %/.built %/.installed %/.checked %/.checked-verbose %/.distchecked %/.disted %/.memchecked
 
 # TODO : add a mode to check that a workspace has changed (dev work, git
 # checked out another branch, etc.) to trigger rebuilds of a project.
@@ -237,6 +238,27 @@ define check_sub
 	  $(TOUCH) "$(BUILD_OBJ_DIR)/$(1)/".checked && \
 	  $(RMFILE) "$(BUILD_OBJ_DIR)/$(1)"/.check-failed || \
 	  { $(TOUCH) "$(BUILD_OBJ_DIR)/$(1)/".check-failed ; exit 1; } \
+	)
+endef
+
+# This assumes that the Makefile is present in submodule's build-dir
+# This is just an additional option flag in zproject generated makefiles,
+# to run the selftest programs in verbose mode. Note that non-zeromq
+# ecosystem projects can lack this recipe and might fail due to that.
+define check_verbose_sub
+	( $(MKDIR) "$(BUILD_OBJ_DIR)/$(1)/$(BUILD_SUB_DIR_$(1))" $(DESTDIR) $(INSTDIR) && \
+	  cd "$(BUILD_OBJ_DIR)/$(1)/$(BUILD_SUB_DIR_$(1))" && \
+	  case "x$(PREP_TYPE_$(1))" in \
+	    xnone)          CCACHE_BASEDIR="$(ORIGIN_SRC_DIR)/$(1)" ;; \
+	    xclone*-obj)    CCACHE_BASEDIR="$(BUILD_OBJ_DIR)/$(1)" ;; \
+	    xclone*-src|*)  CCACHE_BASEDIR="$(BUILD_SRC_DIR)/$(1)" ;; \
+	  esac && \
+	  export CCACHE_BASEDIR && \
+	  $(MAKE) DESTDIR="$(DESTDIR)" \
+	    $(MAKE_COMMON_ARGS_$(1)) $(MAKE_INSTALL_ARGS_$(1)) check-verbose && \
+	  $(TOUCH) "$(BUILD_OBJ_DIR)/$(1)/".checked-verbose && \
+	  $(RMFILE) "$(BUILD_OBJ_DIR)/$(1)"/.check-verbose-failed || \
+	  { $(TOUCH) "$(BUILD_OBJ_DIR)/$(1)/".check-verbose-failed ; exit 1; } \
 	)
 endef
 
@@ -382,7 +404,7 @@ sinclude Makefile-local-$(BUILD_OS).mk
 sinclude Makefile-local-$(BUILD_OS)-$(BUILD_ARCH).mk
 
 # Catch empty expansions
-$(BUILD_OBJ_DIR)//.prep-newestcommit $(BUILD_OBJ_DIR)//.prepped $(BUILD_OBJ_DIR)//.autogened $(BUILD_OBJ_DIR)//.configured $(BUILD_OBJ_DIR)//.built $(BUILD_OBJ_DIR)//.installed $(BUILD_OBJ_DIR)//.checked $(BUILD_OBJ_DIR)//.distchecked $(BUILD_OBJ_DIR)//.disted $(BUILD_OBJ_DIR)//.memchecked:
+$(BUILD_OBJ_DIR)//.prep-newestcommit $(BUILD_OBJ_DIR)//.prepped $(BUILD_OBJ_DIR)//.autogened $(BUILD_OBJ_DIR)//.configured $(BUILD_OBJ_DIR)//.built $(BUILD_OBJ_DIR)//.installed $(BUILD_OBJ_DIR)//.checked $(BUILD_OBJ_DIR)//.checked-verbose $(BUILD_OBJ_DIR)//.distchecked $(BUILD_OBJ_DIR)//.disted $(BUILD_OBJ_DIR)//.memchecked:
 	@echo "Error in recipe expansion, can not build $@ : component part is empty" ; exit 1
 
 ########################### GSL and LIBCIDR ###############################
@@ -399,7 +421,7 @@ $(BUILD_OBJ_DIR)/gsl/.autogened: $(BUILD_OBJ_DIR)/gsl/.prepped
 $(BUILD_OBJ_DIR)/gsl/.configured: $(BUILD_OBJ_DIR)/gsl/.autogened
 	@$(call echo_noop,$@)
 
-$(BUILD_OBJ_DIR)/gsl/.checked $(BUILD_OBJ_DIR)/gsl/.distchecked $(BUILD_OBJ_DIR)/gsl/.memchecked $(BUILD_OBJ_DIR)/gsl/.disted: $(BUILD_OBJ_DIR)/gsl/.built
+$(BUILD_OBJ_DIR)/gsl/.checked $(BUILD_OBJ_DIR)/gsl/.checked-verbose $(BUILD_OBJ_DIR)/gsl/.distchecked $(BUILD_OBJ_DIR)/gsl/.memchecked $(BUILD_OBJ_DIR)/gsl/.disted: $(BUILD_OBJ_DIR)/gsl/.built
 	@$(call echo_noop,$@)
 
 #$(BUILD_OBJ_DIR)/gsl/.built: BUILD_SRC_DIR=$(BUILD_OBJ_DIR)
@@ -418,7 +440,7 @@ $(BUILD_OBJ_DIR)/libcidr/.autogened: $(BUILD_OBJ_DIR)/libcidr/.prepped
 #$(BUILD_OBJ_DIR)/libcidr/.built: BUILD_SRC_DIR=$(BUILD_OBJ_DIR)
 #$(BUILD_OBJ_DIR)/libcidr/.installed: BUILD_SRC_DIR=$(BUILD_OBJ_DIR)
 
-$(BUILD_OBJ_DIR)/libcidr/.checked $(BUILD_OBJ_DIR)/libcidr/.distchecked $(BUILD_OBJ_DIR)/libcidr/.memchecked $(BUILD_OBJ_DIR)/libcidr/.disted: $(BUILD_OBJ_DIR)/libcidr/.built
+$(BUILD_OBJ_DIR)/libcidr/.checked $(BUILD_OBJ_DIR)/libcidr/.checked-verbose $(BUILD_OBJ_DIR)/libcidr/.distchecked $(BUILD_OBJ_DIR)/libcidr/.memchecked $(BUILD_OBJ_DIR)/libcidr/.disted: $(BUILD_OBJ_DIR)/libcidr/.built
 	@$(call echo_noop,$@)
 
 ######################## Other components ##################################
@@ -431,7 +453,7 @@ $(BUILD_OBJ_DIR)/libcidr/.checked $(BUILD_OBJ_DIR)/libcidr/.distchecked $(BUILD_
 COMPONENTS_ALL += zproject
 $(BUILD_OBJ_DIR)/zproject/.autogened: $(BUILD_OBJ_DIR)/gsl/.installed
 
-$(BUILD_OBJ_DIR)/zproject/.checked $(BUILD_OBJ_DIR)/zproject/.distchecked $(BUILD_OBJ_DIR)/zproject/.memchecked: $(BUILD_OBJ_DIR)/zproject/.built
+$(BUILD_OBJ_DIR)/zproject/.checked $(BUILD_OBJ_DIR)/zproject/.checked-verbose $(BUILD_OBJ_DIR)/zproject/.distchecked $(BUILD_OBJ_DIR)/zproject/.memchecked: $(BUILD_OBJ_DIR)/zproject/.built
 	@$(call echo_noop,$@)
 
 COMPONENTS_FTY += cxxtools
@@ -636,6 +658,9 @@ $(BUILD_OBJ_DIR)/fty-metric-snmp/.configured: $(BUILD_OBJ_DIR)/fty-proto/.instal
 COMPONENTS_FTY_EXPERIMENTAL += fty-discovery
 $(BUILD_OBJ_DIR)/fty-discovery/.configured: $(BUILD_OBJ_DIR)/fty-proto/.installed
 
+COMPONENTS_FTY_EXPERIMENTAL += fty-sensor-gpio
+$(BUILD_OBJ_DIR)/fty-sensor-gpio/.configured: $(BUILD_OBJ_DIR)/fty-proto/.installed
+
 COMPONENTS_ALL += $(COMPONENTS_FTY)
 
 ############################# Common route ##################################
@@ -742,6 +767,9 @@ $(BUILD_OBJ_DIR)/%/.installed: $(BUILD_OBJ_DIR)/%/.built
 $(BUILD_OBJ_DIR)/%/.checked: $(BUILD_OBJ_DIR)/%/.built
 	+$(call check_sub,$(notdir $(@D)))
 
+$(BUILD_OBJ_DIR)/%/.checked-verbose: $(BUILD_OBJ_DIR)/%/.built
+	+$(call check_verbose_sub,$(notdir $(@D)))
+
 $(BUILD_OBJ_DIR)/%/.distchecked: $(BUILD_OBJ_DIR)/%/.built
 	+$(call distcheck_sub,$(notdir $(@D)))
 
@@ -795,6 +823,9 @@ install/%: $(BUILD_OBJ_DIR)/%/.installed
 check/%: $(BUILD_OBJ_DIR)/%/.checked
 	@true
 
+check-verbose/%: $(BUILD_OBJ_DIR)/%/.checked-verbose
+	@true
+
 distcheck/%: $(BUILD_OBJ_DIR)/%/.distchecked
 	@true
 
@@ -820,6 +851,10 @@ rebuild/%:
 recheck/%:
 	$(MAKE) clean/$(@F)
 	$(MAKE) $(BUILD_OBJ_DIR)/$(@F)/.checked
+
+recheck-verbose/%:
+	$(MAKE) clean/$(@F)
+	$(MAKE) $(BUILD_OBJ_DIR)/$(@F)/.checked-verbose
 
 redistcheck/%:
 	$(MAKE) clean/$(@F)

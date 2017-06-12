@@ -104,9 +104,20 @@ component directories). Don't forget to `git add` both the updated `Makefile`
 and the new component directory, and to set up your own developer fork for it
 as detailed below.
 
+== Adding new FTY components
+
+When starting a new component, don't hesitate to start with `fty-example` and
+its `project.xml` in particular to seed the generation of your new codebase
+in a way similar to our other components.
+
+If your codebase uses features of C++11 or newer standard, see notes in the
+`.travis.yml` file (re-)generated for your component about requesting an
+appropriate build environment from the Travis CI farm, with a capable compiler.
+
 If the new component delivers `systemd` services that should be manageable
 as part of the 42ITy(TM) product, consider updating the list of recognized
-services used in `fty-core::tools/systemd` and in `fty-rest::systemctl.ecpp`.
+services used in `fty-core::tools/systemd` and in `fty-rest::systemctl.ecpp`
+(or rather `fty-rest::helpers.cc` at this time).
 
 Finally, although orthogonal to updating this repository, don't forget to
 enable Travis CI for the new component and add or update some corresponding
