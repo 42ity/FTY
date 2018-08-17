@@ -765,7 +765,7 @@ $(BUILD_SRC_DIR)/fty-core/.git: $(BUILD_OBJ_DIR)/fty-core/.prepped $(BUILD_SRC_D
 ### TODO: Clarify which dependencies go where? So far it is a copy of
 ### the old fty-rest's list...
 COMPONENTS_FTY += fty-common-logging
-$(BUILD_OBJ_DIR)/fty-common-logging/.configured: $$(BUILD_OBJ_DIR)/$(COMPONENT_LOG4CPLUS)/.installed
+$(BUILD_OBJ_DIR)/fty-common-logging/.configured: $(BUILD_OBJ_DIR)/$(COMPONENT_LOG4CPLUS)/.installed
 
 COMPONENTS_FTY += fty-common
 $(BUILD_OBJ_DIR)/fty-common/.configured: $(BUILD_OBJ_DIR)/libmagic/.installed $(BUILD_OBJ_DIR)/cxxtools/.installed $(BUILD_OBJ_DIR)/$(COMPONENT_LOG4CPLUS)/.installed $(BUILD_OBJ_DIR)/fty-common-logging/.installed
