@@ -161,3 +161,15 @@
 	path = log4cplus-v1.1.2
 	url = https://github.com/42ity/log4cplus.git
 	branch = 1.1.2-FTY-master
+[submodule "fty-common-mlm"]
+	path = fty-common-mlm
+	url = https://github.com/42ity/fty-common-mlm.git
+[submodule "fty-common-logging"]
+	path = fty-common-logging
+	url = https://github.com/42ity/fty-common-logging.git
+[submodule "fty-common-db"]
+	path = fty-common-db
+	url = https://github.com/42ity/fty-common-db.git
+[submodule "fty-common-rest"]
+	path = fty-common-rest
+	url = https://github.com/42ity/fty-common-rest.git
