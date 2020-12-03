@@ -45,6 +45,9 @@ $CI_TIME git pull --all
 # git submodule init --recursive && \
 # git submodule sync --recursive && \
 $CI_TIME git submodule init && \
+$CI_TIME git submodule foreach "git submodule init" && \
+$CI_TIME git submodule foreach "git pull --recurse-submodules" && \
+$CI_TIME git pull --recurse-submodules && \
 $CI_TIME git submodule update --recursive --remote --merge && \
 $CI_TIME git submodule foreach -q --recursive 'git checkout $(git config -f $toplevel/.gitmodules submodule.$name.branch || echo master)' && \
 $CI_TIME git submodule foreach "git pull --all" && \
