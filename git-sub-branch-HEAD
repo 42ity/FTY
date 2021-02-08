@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Find which submodules are checked out not into a branch but into a nameless HEAD
+git submodule foreach "git branch | grep 'HEAD' || true" | grep -B1 HEAD
+
+# OPPOSITE: Find what is current branch
+### git submodule foreach "git branch | grep '*' || echo '=== NO BRANCH?'"
