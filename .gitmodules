@@ -312,3 +312,7 @@
 	path = spdlog
 	url = https://github.com/42ity/spdlog.git
 	branch = master
+[submodule "dlopen-test"]
+	path = dlopen-test
+	url = https://github.com/42ity/dlopen-test.git
+	branch = main
