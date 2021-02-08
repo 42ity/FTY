@@ -316,3 +316,7 @@
 	path = dlopen-test
 	url = https://github.com/42ity/dlopen-test.git
 	branch = main
+[submodule "fty-automatic-group"]
+	path = fty-automatic-group
+	url = https://github.com/42ity/fty-automatic-group.git
+	branch = master
