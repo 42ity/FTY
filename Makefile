@@ -1193,6 +1193,9 @@ $(BUILD_OBJ_DIR)/fty-protoc/.configured: \
 #COMPONENTS_FTY_EXPERIMENTAL += fty-alert-srr
 #COMPONENTS_FTY_EXPERIMENTAL += fty-discovery-ng
 
+#COMPONENTS_FTY_EXPERIMENTAL += dlopen-test
+#COMPONENTS_FTY_EXPERIMENTAL += fty-automatic-group
+
 #COMPONENTS_FTY_EXPERIMENTAL += fty-cmake
 #COMPONENTS_FTY_EXPERIMENTAL += fty-cmake-rest
 #COMPONENTS_FTY_EXPERIMENTAL += fty-cmake-example
