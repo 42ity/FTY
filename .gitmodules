@@ -324,3 +324,7 @@
 	path = fty-common-messagebus2
 	url = https://github.com/42ity/fty-common-messagebus2.git
 	branch = master
+[submodule "release-note"]
+	path = release-note
+	url = https://github.com/42ity/release-note.git
+	branch = master

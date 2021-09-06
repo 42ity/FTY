@@ -1207,6 +1207,8 @@ $(BUILD_OBJ_DIR)/fty-protoc/.configured: \
 ### Maybe this one should later be "built" to deliver the pkgconfig file if needed
 # COMPONENTS_NOBUILD += libpam0g-dev-pkgconfig
 
+COMPONENTS_NOBUILD += release-note
+
 COMPONENTS_ALL += $(COMPONENTS_FTY)
 
 # TODO: Find a way to automate this further
