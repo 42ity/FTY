@@ -72,7 +72,7 @@ gitcmd() {
 
 default_branches() {
     gitcmd submodule foreach -q --recursive \
-    'git checkout $(git config -f $toplevel/.gitmodules submodule.$name.branch || for B in master main devel ; do git branch | grep -w "$B" >/dev/null && echo "$B" && exit ; done )'
+    'echo "=== In `pwd` :" >&2 ; git checkout $(git config -f $toplevel/.gitmodules submodule.$name.branch || for B in master main devel ; do git branch | grep -w "$B" >/dev/null && echo "$B" && exit ; done )'
 }
 
 # Update dispatcher repo
@@ -93,15 +93,15 @@ gitcmd pull --all
 ### gitcmd submodule init && \
 ### gitcmd submodule foreach "git submodule init" && \
 gitcmd submodule init && \
-gitcmd submodule foreach "git submodule init" && \
+gitcmd submodule foreach 'echo "=== In `pwd` :" >&2 ; git submodule init' && \
 default_branches && \
-gitcmd submodule foreach "git pull --recurse-submodules" && \
+gitcmd submodule foreach 'echo "=== In `pwd` :" >&2 ; git pull --recurse-submodules' && \
 gitcmd pull --recurse-submodules && \
 default_branches && \
 gitcmd submodule update --recursive --remote --merge && \
 default_branches && \
-gitcmd submodule foreach "git pull --all" && \
-gitcmd submodule foreach "git pull --tags" && \
+gitcmd submodule foreach 'echo "=== In `pwd` :" >&2 ; git pull --all' && \
+gitcmd submodule foreach 'echo "=== In `pwd` :" >&2 ; git pull --tags' && \
 gitcmd status -s \
 || exit $?
 
