@@ -31,13 +31,52 @@ case "$CI_TRACE" in
         set -x ;;
 esac
 
+TABCHAR="`printf '\t'`"
+
+quoted_string() {
+    # This is mostly for cosmetic purposes
+    STR=""
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            *"'"*)
+                [ -n "$STR" ] \
+                && STR="$STR "'"'"$1"'"' \
+                || STR='"'"$1"'"'
+                ;;
+            *" "*|*"$TABCHAR"*)
+                [ -n "$STR" ] \
+                && STR="$STR '$1'" \
+                || STR="'$1'"
+                ;;
+            *)
+                [ -n "$STR" ] \
+                && STR="$STR $1" \
+                || STR="$1"
+                ;;
+        esac
+        shift
+    done
+    echo "$STR"
+}
+
+LAST_GIT_CMD=""
+gitcmd() {
+    LAST_GIT_CMD="git `quoted_string "$@"`"
+    LAST_GIT_RES=0
+    $CI_TIME git "$@" || LAST_GIT_RES=$?
+    if [ "$LAST_GIT_RES" != 0 ]; then
+        echo "FAILED ($LAST_GIT_RES): $LAST_GIT_CMD" >&2
+    fi
+    return $LAST_GIT_RES
+}
+
 default_branches() {
-    $CI_TIME git submodule foreach -q --recursive \
+    gitcmd submodule foreach -q --recursive \
     'git checkout $(git config -f $toplevel/.gitmodules submodule.$name.branch || for B in master main devel ; do git branch | grep -w "$B" >/dev/null && echo "$B" && exit ; done )'
 }
 
 # Update dispatcher repo
-$CI_TIME git pull --all
+gitcmd pull --all
 
 # Update component repos
 # NOTE: sync is toxic to established workspaces, as it "resyncs the URL" and
@@ -47,32 +86,32 @@ $CI_TIME git pull --all
 # The next line causes submodules to track the branch they are set up to use
 # via .gitmodules file, or the "master" one. Note that each "submodule update"
 # checks out a specified SHA1 and stops tracking any specific branch.
-# git submodule init --recursive && \
-# git submodule sync --recursive && \
+# gitcmd submodule init --recursive && \
+# gitcmd submodule sync --recursive && \
 ### The "submodule init" line may be needed when massively adding new modules,
 ### but toxic otherwise (resets to HEAD and breaks later recurse-submodules):
-### $CI_TIME git submodule init && \
-### $CI_TIME git submodule foreach "git submodule init" && \
-$CI_TIME git submodule init && \
-$CI_TIME git submodule foreach "git submodule init" && \
+### gitcmd submodule init && \
+### gitcmd submodule foreach "git submodule init" && \
+gitcmd submodule init && \
+gitcmd submodule foreach "git submodule init" && \
 default_branches && \
-$CI_TIME git submodule foreach "git pull --recurse-submodules" && \
-$CI_TIME git pull --recurse-submodules && \
+gitcmd submodule foreach "git pull --recurse-submodules" && \
+gitcmd pull --recurse-submodules && \
 default_branches && \
-$CI_TIME git submodule update --recursive --remote --merge && \
+gitcmd submodule update --recursive --remote --merge && \
 default_branches && \
-$CI_TIME git submodule foreach "git pull --all" && \
-$CI_TIME git submodule foreach "git pull --tags" && \
-$CI_TIME git status -s \
+gitcmd submodule foreach "git pull --all" && \
+gitcmd submodule foreach "git pull --tags" && \
+gitcmd status -s \
 || exit $?
 
 if [ x"${DO_BUMP-}" = xno ] ; then
-    git status -s
+    CI_TIME='' gitcmd status -s
     echo "Skip Adding changed objects to git commit (envvar DO_BUMP=no was pre-set)"
 else
     DO_BUMP=no
     # Let shell cut off indentations and other whitespace
-    git status -s | ( while read STATUS OBJNAME ; do
+    CI_TIME='' gitcmd status -s | ( while read STATUS OBJNAME ; do
         if [ -n "$OBJNAME" ]; then
             case "$STATUS" in
                 M) exit 0 ;;
@@ -85,5 +124,5 @@ fi
 
 if [ x"${DO_BUMP-}" = xyes ]; then
     echo "Adding changed objects to git commit (pre-set envvar DO_BUMP=no to avoid this)..."
-    $CI_TIME git commit -a -m 'Updated references to git submodule HEADs at '"`date -u`"
+    gitcmd commit -a -m 'Updated references to git submodule HEADs at '"`date -u`"
 fi
