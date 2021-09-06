@@ -63,6 +63,7 @@ LAST_GIT_CMD=""
 gitcmd() {
     LAST_GIT_CMD="git `quoted_string "$@"`"
     LAST_GIT_RES=0
+    echo "== Executing: $LAST_GIT_CMD ..." >&2
     $CI_TIME git "$@" || LAST_GIT_RES=$?
     if [ "$LAST_GIT_RES" != 0 ]; then
         echo "FAILED ($LAST_GIT_RES): $LAST_GIT_CMD" >&2
