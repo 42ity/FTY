@@ -929,6 +929,8 @@ COMPONENTS_FTY += fty-common-socket
 
 COMPONENTS_FTY += fty-common-messagebus
 
+COMPONENTS_FTY += fty-common-messagebus2
+
 COMPONENTS_FTY += fty-common-dto
 
 COMPONENTS_FTY += fty-proto

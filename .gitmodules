@@ -320,3 +320,7 @@
 	path = fty-automatic-group
 	url = https://github.com/42ity/fty-automatic-group.git
 	branch = master
+[submodule "fty-common-messagebus2"]
+	path = fty-common-messagebus2
+	url = https://github.com/42ity/fty-common-messagebus2.git
+	branch = master
