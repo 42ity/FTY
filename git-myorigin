@@ -43,6 +43,10 @@ change_upstream() (
         fi
     fi
 
+    echo "===== Trying to track 'upstream' repo for the main code branch:"
+    git branch -u 'upstream/master' master \
+    || true
+
     echo "===== SYNC:"
     git pull --all && \
     git pull --tags
