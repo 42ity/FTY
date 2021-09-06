@@ -14,9 +14,15 @@ Note this script WILL CHANGE CURRENT BRANCH in your checkouts!
 (Sleeping 5 sec so you can Ctrl+C)
 EOF
 
+# See sync.sh for authoritative copy
+default_branches() {
+    git submodule foreach -q --recursive \
+    'git checkout $(git config -f $toplevel/.gitmodules submodule.$name.branch || for B in master main devel ; do git branch | grep -w "$B" >/dev/null && echo "$B" && exit ; done )'
+}
+
 sleep 5
 
-git submodule foreach -q --recursive 'git checkout $(git config -f $toplevel/.gitmodules submodule.$name.branch || echo master)' \
+default_branches \
 && gmake emerge -j -k \
 || { echo 'FAILED' >&2 ; exit 1; }
 
